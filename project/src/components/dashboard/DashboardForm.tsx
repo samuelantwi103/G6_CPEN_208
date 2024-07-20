@@ -12,9 +12,9 @@ const CourseDashboard = () => {
   return (
 
     <div className="p-0 bg-gray-100">
-    // calling GetDate function from GetDate.tsx
+    {/* // calling GetDate function from GetDate.tsx */}
     <GetDate/>
-    // div class to display a message based on the time of the day
+    {/* // div class to display a message based on the time of the day */}
     <div className="mb-6">
     <h2 className="text-2xl font-bold">Good {timeOfDay} Guys😂!</h2>
         {timeOfDay === 'morning' && <p>Time to have a great start to your day!</p>}
@@ -22,7 +22,7 @@ const CourseDashboard = () => {
         {timeOfDay === 'evening' && <p>Have a relaxing evening!</p>}
     </div>
       
-    // This is used to display your courses
+    {/* // This is used to display your courses */}
     <div className="mb-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold">Your courses</h3>
@@ -51,7 +51,7 @@ const CourseDashboard = () => {
             </Card>
           </div>
 
-          // This is used to display the course tasks
+          {/* // This is used to display the course tasks */}
           <Card className="bg-white shadow-sm mb-6">
             <CardHeader>
               <div className="flex justify-between items-center">

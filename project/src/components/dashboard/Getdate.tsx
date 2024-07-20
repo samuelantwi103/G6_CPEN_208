@@ -35,7 +35,7 @@ const GetDate = () => {
     
     
       <div className="flex justify-between items-center mb-6">
-        // div class to display the search on the left
+        {/* // div class to display the search on the left */}
         <div className="relative">
           <input
             type="text"
@@ -45,7 +45,7 @@ const GetDate = () => {
           <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
         </div>
         
-        // div class to display the time and date on the right
+        {/* // div class to display the time and date on the right */}
         <div className="flex items-center space-x-4 ">
           <p className="text-sm text-gray-600 ">{formatDate(currentDateTime)}</p>
           <p className="text-sm text-gray-600">{formatTime(currentDateTime)}</p>

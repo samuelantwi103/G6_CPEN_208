@@ -94,7 +94,7 @@ const SignInForm = () => {
           </button>
         </form>
         <p className="text-xs text-center text-gray-500">
-          Don't have an account? <a href="/signup" className="text-blue-500 font-semibold">Sign Up</a>
+          Don&apos;t have an account? <a href="/signup" className="text-blue-500 font-semibold">Sign Up</a>
         </p>
       </div>
     </div>
