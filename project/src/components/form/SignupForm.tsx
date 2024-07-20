@@ -70,7 +70,7 @@ const SignUpForm = () => {
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-xl font-semibold text-center text-blue-500 mb-2">University of Ghana</h1>
         <h2 className="text-2xl font-bold mb-2 text-center">Sign Up</h2>
-        <p className="text-center text-gray-600 mb-6">Let's create your account</p>
+        <p className="text-center text-gray-600 mb-6">Let&apos;s create your account</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           
           <div className="relative">
