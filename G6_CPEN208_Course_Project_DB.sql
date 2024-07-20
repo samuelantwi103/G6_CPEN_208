@@ -52,7 +52,7 @@ CREATE TABLE admin.admin_data (
 CREATE TABLE student.account_data (
     id BIGSERIAL PRIMARY KEY,
     account_id BIGSERIAL UNIQUE NOT NULL,
-    student_id INT NOT NULL REFERENCES student.student_data(student_id),
+    student_id INT NOT NULL UNIQUE REFERENCES student.student_data(student_id),
     account_balance NUMERIC(15,2) NOT NULL
 );
 
