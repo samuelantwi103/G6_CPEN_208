@@ -7,11 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 
 const CourseDashboard = () => {
+  // calling the getTime function from getTime.ts
   const timeOfDay = getTime();
   return (
 
     <div className="p-0 bg-gray-100">
+    // calling GetDate function from GetDate.tsx
     <GetDate/>
+    // div class to display a message based on the time of the day
     <div className="mb-6">
     <h2 className="text-2xl font-bold">Good {timeOfDay} Guys😂!</h2>
         {timeOfDay === 'morning' && <p>Time to have a great start to your day!</p>}
@@ -19,7 +22,7 @@ const CourseDashboard = () => {
         {timeOfDay === 'evening' && <p>Have a relaxing evening!</p>}
     </div>
       
-
+    // This is used to display your courses
     <div className="mb-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold">Your courses</h3>
@@ -35,6 +38,7 @@ const CourseDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+            
             <Card className="bg-white shadow-sm">
               <CardContent className="p-4 flex items-center">
                 <div className="w-12 h-12 bg-gray-200 rounded-lg mr-4"></div>
@@ -46,6 +50,8 @@ const CourseDashboard = () => {
               </CardContent>
             </Card>
           </div>
+
+          // This is used to display the course tasks
           <Card className="bg-white shadow-sm mb-6">
             <CardHeader>
               <div className="flex justify-between items-center">
