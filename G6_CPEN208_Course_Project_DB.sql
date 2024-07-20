@@ -299,127 +299,446 @@ Function to Retrieve Payment History for a Student
 Below are the SQL statements for these functions:
 */
 
--- Function to Enroll a Student in a Course
-CREATE OR REPLACE FUNCTION enroll_course(p_student_id INT, p_course_id INT)
-RETURNS VOID AS $$
+
+-- Function in student schema to sign up student to student_data table
+CREATE OR REPLACE FUNCTION student.sign_up_student(student_info JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
 BEGIN
-    INSERT INTO student.course_enrollment (student_id, course_id)
-    VALUES (p_student_id, p_course_id);
+    INSERT INTO student.student_data (student_id, fname, lname, oname, email, phone, password, dob, profile_img, level)
+    VALUES (
+        (SELECT COALESCE(MAX(student_id), 11111110) + 1 FROM student.student_data),
+        student_info->>'fname',
+        student_info->>'lname',
+        student_info->>'oname',
+        student_info->>'email',
+        student_info->>'phone',
+        student_info->>'password',
+        to_date(student_info->>'dob', 'YYYY-MM-DD'),
+        student_info->>'profile_img',
+        (student_info->>'level')::INT
+    )
+    RETURNING student_id INTO result;
+    
+    RETURN json_build_object('status', 'success', 'student_id', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
 END;
 $$ LANGUAGE plpgsql;
 
--- Function to Record a Payment
-CREATE OR REPLACE FUNCTION make_payment(p_student_id INT, p_amount INT,p_year INT, p_reference VARCHAR(255))
-RETURNS VOID AS $$
+-- USE CASE
+SELECT student.sign_up_student('{"fname": "Roland", "lname": "Berko", "oname": "Anane", "email": "jane.doe@st.ug.edu.gh", "phone": "0547654321", "password": "password123", "dob": "2001-02-02", "profile_img": null, "level": 300}');
+
+-- Function in admin schema to authenticate student, staff and admins
+CREATE OR REPLACE FUNCTION admin.authenticate_user(uemail TEXT, upassword TEXT)
+RETURNS JSON AS $$
+DECLARE
+    user_type TEXT;
 BEGIN
-    INSERT INTO student.payment_records (student_id, payment_year, reference, amount)
-    VALUES (p_student_id, p_year, p_reference, p_amount);
+    -- Check in student_data
+    IF EXISTS (SELECT 1 FROM student.student_data WHERE email = uemail AND password = upassword) THEN
+        user_type := 'student';
+    -- Check in staff_data
+    ELSIF EXISTS (SELECT 1 FROM staff.staff_data WHERE email = uemail AND password = upassword) THEN
+        user_type := 'staff';
+    -- Check in admin_data
+    ELSIF EXISTS (SELECT 1 FROM admin.admin_data WHERE email = uemail AND password = upassword) THEN
+        user_type := 'admin';
+    ELSE
+        RETURN json_build_object('status', 'error', 'message', 'Invalid credentials');
+    END IF;
+
+    RETURN json_build_object('status', 'success', 'user_type', user_type);
 END;
 $$ LANGUAGE plpgsql;
 
--- -- Function to Update Student Information
--- CREATE OR REPLACE FUNCTION update_student_info(p_student_id INT, p_fname VARCHAR, p_lname VARCHAR, p_email VARCHAR, p_phone VARCHAR)
--- RETURNS VOID AS $$
+-- USE CASE
+SELECT admin.authenticate_user('jasiamah@ug.edu.gh', 'password123');
+
+-- Function in admin schema to add staff to staff_data
+CREATE OR REPLACE FUNCTION admin.add_staff(staff_info JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    INSERT INTO staff.staff_data (staff_id, fname, lname, oname, email, phone, password, dob, profile_img)
+    VALUES (
+        (SELECT COALESCE(MAX(staff_id), 11111110) + 1 FROM staff.staff_data),
+        staff_info->>'fname',
+        staff_info->>'lname',
+        staff_info->>'oname',
+        staff_info->>'email',
+        staff_info->>'phone',
+        staff_info->>'password',
+        to_date(staff_info->>'dob', 'YYYY-MM-DD'),
+        staff_info->>'profile_img'
+    )
+    RETURNING staff_id INTO result;
+    
+    RETURN json_build_object('status', 'success', 'staff_id', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT admin.add_staff('{"fname": "John", "lname": "Asiamah", "oname": null, "email": "jasiamah@ug.edu.gh", "phone": "0547854321", "password": "password123", "dob": "1992-02-02", "profile_img": null }');
+
+
+-- Function in student schema to Enroll a Student in a Course
+CREATE OR REPLACE FUNCTION student.enroll_student(enrollment_info JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    INSERT INTO student.course_enrollment (enrollment_id, student_id, course_id, date_enrolled)
+        (SELECT COALESCE(MAX(enrollment_id), 11111110) + 1 FROM student.course_enrollment),
+        (enrollment_info->>'student_id')::INT,
+        (enrollment_info->>'course_id')::INT,
+        CURRENT_DATE
+    )
+    RETURNING enrollment_id INTO result;
+    
+    RETURN json_build_object('status', 'success', 'enrollment_id', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+    VALUES (
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT student.enroll_student('{"student_id": 11111114, "course_id": 11111111}');
+
+-- Function in admin schema to add admin to admin_data
+CREATE OR REPLACE FUNCTION admin.add_admin(admin_info JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    INSERT INTO admin.admin_data (admin_id, fname, lname, oname, email, phone, password, dob, role)
+    VALUES (
+        (SELECT COALESCE(MAX(admin_id), 11111110) + 1 FROM admin.admin_data),
+        admin_info->>'fname',
+        admin_info->>'lname',
+        admin_info->>'oname',
+        admin_info->>'email',
+        admin_info->>'phone',
+        admin_info->>'password',
+        to_date(admin_info->>'dob', 'YYYY-MM-DD'),
+        admin_info->>'role'
+    )
+    RETURNING admin_id INTO result;
+    
+    RETURN json_build_object('status', 'success', 'admin_id', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT admin.add_admin('{"fname": "Bob", "lname": "Johnson", "oname": null, "email": "bob.johnson@example.com", "phone": "0233445566", "password": "password789", "dob": "1970-04-04", "role": "Software Admin"}');
+
+
+
+-- NEXT STOP HERE
+-- Function in student schema to Record a Payment
+CREATE OR REPLACE FUNCTION student.record_payment(payment_info JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    INSERT INTO student.payment_records (payment_id, student_id, amount, payment_year, reference, payment_date)
+    VALUES (
+        (SELECT COALESCE(MAX(payment_id), 11111110) + 1 FROM student.payment_records),
+        (payment_info->>'student_id')::INT,
+        (payment_info->>'amount')::NUMERIC(15,2),
+        (payment_info->>'payment_year')::INT,
+        payment_info->>'reference',
+        CURRENT_DATE
+    )
+    RETURNING payment_id INTO result;
+    
+    RETURN json_build_object('status', 'success', 'payment_id', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT student.record_payment('{"student_id": 11111111, "amount": 1500.50, "payment_year": 2023, "reference": "academic"}');
+
+
+
+-- -- Function in student schema to Update Student Information
+-- CREATE OR REPLACE FUNCTION student.update_student_info(student_id INT, student_info JSON)
+-- RETURNS JSON AS $$
 -- BEGIN
 --     UPDATE student.student_data
---     SET fname = p_fname,
---         lname = p_lname,
---         email = p_email,
---         phone = p_phone
---     WHERE student_id = p_student_id;
+--     SET 
+--         fname = COALESCE(student_info->>'fname', fname),
+--         lname = COALESCE(student_info->>'lname', lname),
+--         oname = COALESCE(student_info->>'oname', oname),
+--         email = COALESCE(student_info->>'email', email),
+--         phone = COALESCE(student_info->>'phone', phone),
+--         password = COALESCE(student_info->>'password', password),
+--         dob = COALESCE((student_info->>'dob')::DATE, dob),
+--         profile_img = COALESCE(student_info->>'profile_img', profile_img),
+--         level = COALESCE((student_info->>'level')::INT, level)
+--     WHERE student_id = student_id;
+
+--     RETURN json_build_object('status', 'success', 'message', 'Student information updated successfully');
+-- EXCEPTION
+--     WHEN OTHERS THEN
+--         RETURN json_build_object('status', 'error', 'message', SQLERRM);
 -- END;
 -- $$ LANGUAGE plpgsql;
 
--- -- Function to Retrieve Student Grades
--- CREATE OR REPLACE FUNCTION get_student_grades(p_student_id INT)
--- RETURNS TABLE(course_id INT, grade VARCHAR(2)) AS $$
--- BEGIN
---     RETURN QUERY
---     SELECT course_id, grade
---     FROM student.course_enrollment
---     WHERE student_id = p_student_id;
--- END;
--- $$ LANGUAGE plpgsql;
-
--- -- Function to Calculate GPA
--- CREATE OR REPLACE FUNCTION calculate_gpa(p_student_id INT)
--- RETURNS NUMERIC AS $$
--- DECLARE
---     total_points INT := 0;
---     total_credits INT := 0;
---     record RECORD;
--- BEGIN
---     FOR record IN
---         SELECT ce.course_id, ce.grade, cd.credit_hour
---         FROM student.course_enrollment ce
---                 JOIN admin.course_data cd ON ce.course_id = cd.course_id
---         WHERE ce.student_id = p_student_id
---     LOOP
---         total_credits := total_credits + record.credit_hour;
-        
---         CASE record.grade
---             WHEN 'A' THEN total_points := total_points + (4 * record.credit_hour);
---             WHEN 'B' THEN total_points := total_points + (3 * record.credit_hour);
---             WHEN 'C' THEN total_points := total_points + (2 * record.credit_hour);
---             WHEN 'D' THEN total_points := total_points + (1 * record.credit_hour);
---             WHEN 'F' THEN total_points := total_points + (0 * record.credit_hour);
---         END CASE;
---     END LOOP;
-
---     IF total_credits = 0 THEN
---         RETURN 0;
---     ELSE
---         RETURN total_points / total_credits;
---     END IF;
--- END;
--- $$ LANGUAGE plpgsql;
-
--- -- Function to Retrieve Course Information
--- CREATE OR REPLACE FUNCTION get_course_info(p_course_id INT)
--- RETURNS TABLE(course_id INT, course_code VARCHAR, course_name VARCHAR, credit_hour INT, academic_year INT, semester INT, description VARCHAR, img VARCHAR) AS $$
--- BEGIN
---     RETURN QUERY
---     SELECT course_id, course_code, course_name, credit_hour, academic_year, semester, description, img
---     FROM admin.course_data
---     WHERE course_id = p_course_id;
--- END;
--- $$ LANGUAGE plpgsql;
-
--- -- Function to Assign a Lecturer to a Course
--- CREATE OR REPLACE FUNCTION assign_lecturer(p_staff_id INT, p_course_id INT)
--- RETURNS VOID AS $$
--- BEGIN
---     INSERT INTO staff.lecturer_assignment (staff_id, course_id)
---     VALUES (p_staff_id, p_course_id);
--- END;
--- $$ LANGUAGE plpgsql;
-
--- -- Function to Get Lecturer's Course Assignments
--- CREATE OR REPLACE FUNCTION get_lecturer_courses(p_staff_id INT)
--- RETURNS TABLE(course_id INT, course_name VARCHAR) AS $$
--- BEGIN
---     RETURN QUERY
---     SELECT la.course_id, cd.course_name
---     FROM staff.lecturer_assignment la
---     JOIN admin.course_data cd ON la.course_id = cd.course_id
---     WHERE la.staff_id = p_staff_id;
--- END;
--- $$ LANGUAGE plpgsql;
-
--- -- Function to Retrieve Payment History for a Student
--- CREATE OR REPLACE FUNCTION get_payment_history(p_student_id INT)
--- RETURNS TABLE(payment_id INT, payment_year INT, reference VARCHAR, payment_date DATE, amount INT) AS $$
--- BEGIN
---     RETURN QUERY
---     SELECT payment_id, payment_year, reference, payment_date, amount
---     FROM student.payment_records
---     WHERE student_id = p_student_id;
--- END;
--- $$ LANGUAGE plpgsql;
+-- -- USE CASE
+-- SELECT student.update_student_info(11111111, '{"fname": "John", "lname": "Doe", "oname": "Updated", "email": "john.updated@example.com", "phone": "1234509876", "password": "newpassword123", "dob": "2000-01-01", "profile_img": "updated_profile.jpg", "level": 300}');
 
 
+-- Function in student schema to Retrieve Student Grades
+CREATE OR REPLACE FUNCTION student.retrieve_student_grades(s_id INT)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    SELECT json_agg(row_to_json(t))
+    INTO result
+    FROM (
+        SELECT course_id, score, grade 
+        FROM student.course_enrollment 
+        WHERE student_id = s_id
+    ) t;
+
+    RETURN json_build_object('status', 'success', 'grades', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT student.retrieve_student_grades(11111111);
 
 
+-- Function in student schema to Calculate GPA based on University of Ghana CGPA system
+CREATE OR REPLACE FUNCTION student.calculate_gpa(s_id INT)
+RETURNS JSON AS $$
+DECLARE
+    total_points NUMERIC := 0;
+    total_credits INT := 0;
+    gpa NUMERIC(3,2);
+    course RECORD;
+BEGIN
+    FOR course IN
+        SELECT ce.score, cd.credit_hour
+        FROM student.course_enrollment ce
+        JOIN admin.course_data cd ON ce.course_id = cd.course_id
+        WHERE ce.student_id = s_id
+    LOOP
+        total_credits := total_credits + course.credit_hour;
+        IF course.score >= 80 THEN
+            total_points := total_points + (4.0 * course.credit_hour);
+        ELSIF course.score >= 75 THEN
+            total_points := total_points + (3.5 * course.credit_hour);
+        ELSIF course.score >= 70 THEN
+            total_points := total_points + (3.0 * course.credit_hour);
+        ELSIF course.score >= 65 THEN
+            total_points := total_points + (2.5 * course.credit_hour);
+        ELSIF course.score >= 60 THEN
+            total_points := total_points + (2.0 * course.credit_hour);
+        ELSIF course.score >= 55 THEN
+            total_points := total_points + (1.5 * course.credit_hour);
+        ELSIF course.score >= 50 THEN
+            total_points := total_points + (1.0 * course.credit_hour);
+        ELSE
+            total_points := total_points + (0.0 * course.credit_hour);
+        END IF;
+    END LOOP;
+
+    IF total_credits > 0 THEN
+        gpa := total_points / total_credits;
+    ELSE
+        gpa := 0;
+    END IF;
+
+    RETURN json_build_object('status', 'success', 'gpa', gpa);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT student.calculate_gpa(11111111);
+
+-- Function in admin schema to Retrieve Course Information
+CREATE OR REPLACE FUNCTION admin.retrieve_course_info(c_id INT)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    SELECT row_to_json(t)
+    INTO result
+    FROM (
+        SELECT * 
+        FROM admin.course_data 
+        WHERE course_id = c_id
+    ) t;
+
+    RETURN json_build_object('status', 'success', 'course', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT admin.retrieve_course_info(11111111);
 
 
+-- Function in admin schema to Assign a Lecturer to a Course
+CREATE OR REPLACE FUNCTION admin.assign_lecturer(assignment_info JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    INSERT INTO staff.lecturer_assignment (assignment_id, staff_id, course_id)
+    VALUES (
+        (SELECT COALESCE(MAX(assignment_id), 11111110) + 1 FROM staff.lecturer_assignment),
+        (assignment_info->>'staff_id')::INT,
+        (assignment_info->>'course_id')::INT
+    )
+    RETURNING assignment_id INTO result;
+    
+    RETURN json_build_object('status', 'success', 'assignment_id', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
 
+-- USE CASE
+SELECT admin.assign_lecturer('{"staff_id": 11111111, "course_id": 11111111}');
+
+
+-- Function in staff schema to Get Lecturer's Course Assignments
+CREATE OR REPLACE FUNCTION staff.get_lecturer_courses(s_id INT)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    SELECT json_agg(row_to_json(t))
+    INTO result
+    FROM (
+        SELECT la.course_id, cd.course_code, cd.course_name
+        FROM staff.lecturer_assignment la
+		JOIN admin.course_data cd ON cd.course_id = la.course_id
+        WHERE staff_id = s_id
+    ) t;
+
+    RETURN json_build_object('status', 'success', 'courses', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT staff.get_lecturer_courses(11111111);
+
+
+-- Function in staff schema to assign score in course_enrollment table
+CREATE OR REPLACE FUNCTION staff.assign_score(score_info JSON)
+RETURNS JSON AS $$
+BEGIN
+    UPDATE student.course_enrollment
+    SET score = (score_info->>'score')::INT
+    WHERE enrollment_id = (score_info->>'enrollment_id')::INT;
+
+    RETURN json_build_object('status', 'success', 'message', 'Score assigned successfully');
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT staff.assign_score('{"enrollment_id": 11111111, "score": 85}');
+
+
+-- Function in student schema to Retrieve Payment History for a Student
+-- DROP FUNCTION student.retrieve_payment_history(INT);
+CREATE OR REPLACE FUNCTION student.retrieve_payment_history(s_id INT)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    SELECT json_agg(row_to_json(t))
+    INTO result
+    FROM (
+        SELECT payment_id, amount, payment_year, reference, payment_date
+        FROM student.payment_records
+        WHERE student_id = s_id
+    ) t;
+
+    RETURN json_build_object('status', 'success', 'payments', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT student.retrieve_payment_history(11111111);
+
+
+-- Function to get the class list for a specific course
+-- DROP FUNCTION staff.get_classlist(INT);
+CREATE OR REPLACE FUNCTION staff.get_classlist(c_id INT)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    -- Retrieve the class list for the given course
+    result := json_agg(
+        json_build_object(
+            'student_id', sd.student_id,
+            'fname', sd.fname,
+            'lname', sd.lname,
+            'oname', sd.oname,
+            'email', sd.email,
+            'phone', sd.phone,
+            'dob', sd.dob,
+            'profile_img', sd.profile_img,
+            'level', sd.level,
+            'date_enrolled', ce.date_enrolled
+        )
+    )
+    FROM student.course_enrollment ce
+    JOIN student.student_data sd ON ce.student_id = sd.student_id
+    WHERE ce.course_id = c_id;
+    
+    -- Handle case when no students are enrolled in the course
+    IF result IS NULL THEN
+        result := json_build_object('status', 'error', 'message', 'No students enrolled in this course');
+    ELSE
+        result := json_build_object('status', 'success', 'course_id', c_id, 'classlist', result);
+    END IF;
+
+    RETURN result;
+EXCEPTION
+    WHEN others THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT staff.get_classlist(11111113);
