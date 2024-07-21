@@ -16,78 +16,76 @@ import {
 import SidebarItem from "@/components/sidebar/item";
 import Sidebaritem from "@/components/sidebar/item";
 import { useSession } from "next-auth/react";
+import { useParams } from "next/navigation";
 
-interface Sidebaritem {
-  name: string;
-  icon: LucideIcon;
-  path: string;
-  items?: SubItem[];
-}
 
-interface SubItem {
-  name: string;
-  path: string;
-}
-
-const items: Sidebaritem[] = [
-  {
-    name: "Dashboard",
-    path: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    name: "Profile",
-    path: "/profile",
-    icon: CircleUser,
-  },
-  {
-    name: "Finance info",
-    path: "/finance",
-    icon: Wallet,
-  },
-  {
-    name: "Courses",
-    path: "/courses",
-    icon: Book,
-  },
-  {
-    name: "Assignments",
-    path: "/assignments",
-    icon: School,
-  },
-  {
-    name: "Events",
-    path: "/events",
-    icon: CalendarCheck,
-  },
-  {
-    name: "Log out",
-    path: "/",
-    icon: LogOutIcon,
-  },
-];
 const Sidebar = () => {
- 
+  const params = useParams();
+
+  interface Sidebaritem {
+    name: string;
+    icon: LucideIcon;
+    path: string;
+    items?: SubItem[];
+  }
+  
+  interface SubItem {
+    name: string;
+    path: string;
+  }
+  
+  const itemsTop: Sidebaritem[] = [
+    {
+      name: "Dashboard",
+      path: `/student/${params.id}`,
+      icon: LayoutDashboard,
+    },
+    {
+      name: "Courses",
+      path: `/student/${params.id}/courses`,
+      icon: Book,
+    },
+    {
+      name: "Finance info",
+      path: `/student/${params.id}/finance`,
+      icon: Wallet,
+    },
+  ];
+  const itemsBottom: Sidebaritem[] = [
+    {
+      name: "Profile",
+      path: `/student/${params.id}/profile`,
+      icon: CircleUser,
+    },
+    {
+      name: "Log out",
+      path: "/",
+      icon: LogOutIcon,
+    },
+  ];
+ console.log(params)
   return (
-   
-       <div >
-      <div >
+    <div className=" flex sticky top-16 z-[400]">
+      <div>
         {/* <Image className={styles.userImage} src="/noavatar.png" alt="" width={50} height={50}/> */}
         {/* <div className={styles.userDetail}>
           <span className={styles.username}>Yhoung</span>
           <span className={styles.userTitle}>John@gmail.com</span>
           </div> */}
       </div>
-      <div className="flex flex-col space-y-10 w-full ">
-        <div  className="flex flex-col space-y-2 bg-green ">
-          {items.map((item) => (
+      <div className="flex flex-col space-y-10 justify-between w-full h-[calc(100vh-150px)]">
+        <div className="flex flex-col space-y-2 bg-green ">
+          {itemsTop.map((item) => (
+            <SidebarItem key={item.path} item={item} />
+          ))}
+        </div>
+        <div className="flex flex-col space-y-2 bg-green ">
+          {itemsBottom.map((item) => (
             <SidebarItem key={item.path} item={item} />
           ))}
         </div>
       </div>
     </div>
-     
-    
   );
 };
 

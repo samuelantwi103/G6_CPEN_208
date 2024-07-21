@@ -2,6 +2,7 @@
 import React, { useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 interface Sidebaritem {
   name: string;
@@ -18,20 +19,24 @@ const SidebarItem = ({ item }: { item: Sidebaritem }) => {
   const { name, icon: Icon, path } = item;
   const router = useRouter();
   const pathname = usePathname();
-  const onClick = () => {
-    router.push(path);
-  };
+  // const onClick = () => {
+  //   router.push(path);
+  // };
 
-  const isActive = useMemo(() => { return path === pathname;}, [path, pathname])
+  const isActive = useMemo(() => {
+    return path === pathname;
+  }, [path, pathname]);
   return (
-    <div
-      className={`flex items-center space-x-2 p-3 rounded-lg hover:bg-slate-300 cursor-pointer hover:text-sky-900 ${isActive && "text-sky-900 bg-sidebar-active"}`}
-      onClick={onClick}
+    <Link href={path}
+      className={`flex items-center space-x-2 p-3 rounded-lg hover:bg-slate-300 cursor-pointer hover:text-sky-900 ${
+        isActive && "bg-sky-900 text-white rounded-tl-none rounded-bl-none"
+      }`}
+      // onClick={onClick}
     >
       <Icon size={22} />
 
       <p className="text-sm font-semibold">{name}</p>
-    </div>
+    </Link>
   );
 };
 
