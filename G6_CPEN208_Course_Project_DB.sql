@@ -301,6 +301,7 @@ Below are the SQL statements for these functions:
 
 
 -- Function in student schema to sign up student to student_data table
+-- x
 CREATE OR REPLACE FUNCTION student.sign_up_student(student_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -332,6 +333,7 @@ $$ LANGUAGE plpgsql;
 SELECT student.sign_up_student('{"fname": "Roland", "lname": "Berko", "oname": "Anane", "email": "jane.doe@st.ug.edu.gh", "phone": "0547654321", "password": "password123", "dob": "2001-02-02", "profile_img": null, "level": 300}');
 
 -- Function in admin schema to authenticate student, staff and admins
+-- 
 CREATE OR REPLACE FUNCTION admin.authenticate_user(uemail TEXT, upassword TEXT)
 RETURNS JSON AS $$
 DECLARE
@@ -742,3 +744,33 @@ $$ LANGUAGE plpgsql;
 
 -- USE CASE
 SELECT staff.get_classlist(11111113);
+
+
+-- Outstanding Fees
+CREATE OR REPLACE FUNCTION student.calculate_outstanding_fees(s_id INT, acad_year INT)
+RETURNS NUMERIC(15,2) AS $$
+DECLARE
+    total_fees NUMERIC(15,2);
+    total_payments NUMERIC(15,2);
+    outstanding_fees NUMERIC(15,2);
+BEGIN
+    -- Calculate total fees for the academic year
+    SELECT COALESCE(SUM(fee), 0) INTO total_fees
+    FROM admin.fees_data
+    WHERE academic_year = acad_year;
+
+    -- Calculate total payments made by the student for the academic year
+    SELECT COALESCE(SUM(amount), 0) INTO total_payments
+    FROM student.payment_records
+    WHERE student_id = s_id
+    AND payment_year = acad_year;
+
+    -- Calculate outstanding fees
+    outstanding_fees = total_fees - total_payments;
+
+    RETURN outstanding_fees;
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT student.calculate_outstanding_fees(11111111, 2022);
