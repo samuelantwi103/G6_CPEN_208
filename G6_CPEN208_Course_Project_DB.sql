@@ -333,7 +333,7 @@ $$ LANGUAGE plpgsql;
 SELECT student.sign_up_student('{"fname": "Roland", "lname": "Berko", "oname": "Anane", "email": "jane.doe@st.ug.edu.gh", "phone": "0547654321", "password": "password123", "dob": "2001-02-02", "profile_img": null, "level": 300}');
 
 -- Function in admin schema to authenticate student, staff and admins
--- 
+-- \/
 CREATE OR REPLACE FUNCTION admin.authenticate_user(uemail TEXT, upassword TEXT)
 RETURNS JSON AS $$
 DECLARE
@@ -360,6 +360,7 @@ $$ LANGUAGE plpgsql;
 SELECT admin.authenticate_user('jasiamah@ug.edu.gh', 'password123');
 
 -- Function in admin schema to add staff to staff_data
+-- x
 CREATE OR REPLACE FUNCTION admin.add_staff(staff_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -391,6 +392,7 @@ SELECT admin.add_staff('{"fname": "John", "lname": "Asiamah", "oname": null, "em
 
 
 -- Function in student schema to Enroll a Student in a Course
+-- x
 CREATE OR REPLACE FUNCTION student.enroll_student(enrollment_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -416,6 +418,7 @@ $$ LANGUAGE plpgsql;
 SELECT student.enroll_student('{"student_id": 11111114, "course_id": 11111111}');
 
 -- Function in admin schema to add admin to admin_data
+-- x
 CREATE OR REPLACE FUNCTION admin.add_admin(admin_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -449,6 +452,7 @@ SELECT admin.add_admin('{"fname": "Bob", "lname": "Johnson", "oname": null, "ema
 
 -- NEXT STOP HERE
 -- Function in student schema to Record a Payment
+-- x
 CREATE OR REPLACE FUNCTION student.record_payment(payment_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -506,6 +510,7 @@ SELECT student.record_payment('{"student_id": 11111111, "amount": 1500.50, "paym
 
 
 -- Function in student schema to Retrieve Student Grades
+-- \/
 CREATE OR REPLACE FUNCTION student.retrieve_student_grades(s_id INT)
 RETURNS JSON AS $$
 DECLARE
@@ -531,6 +536,7 @@ SELECT student.retrieve_student_grades(11111111);
 
 
 -- Function in student schema to Calculate GPA based on University of Ghana CGPA system
+-- \/
 CREATE OR REPLACE FUNCTION student.calculate_gpa(s_id INT)
 RETURNS JSON AS $$
 DECLARE

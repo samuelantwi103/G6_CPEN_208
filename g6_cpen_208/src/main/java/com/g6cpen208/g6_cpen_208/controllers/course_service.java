@@ -18,21 +18,38 @@ public class course_service {
   private db_layer db_config;
 
   // GET HTTP REQUESTS
-  // Yearly outstanding fess
+  // Yearly outstanding fees
   @GetMapping("/yearly_outstanding_fees")
   public Object yearly_outstanding_fees(@RequestParam int s_id, @RequestParam int acad_year) {
     course_l.con = db_config.getCon();
     Object result = course_l.outstanding_fees(s_id, acad_year);
     return result;
   }
-
-  // Yearly outstanding fess
+  
+  // Authenticate User
   @GetMapping("/auth_user")
   public Object auth_user(@RequestParam String id, @RequestParam String password) {
     course_l.con = db_config.getCon();
     Object result = course_l.authenticate_user(id, password);
     return result;
   }
+  
+  // Retrieve student grades
+  @GetMapping("/student_grades")
+  public Object retrieve_student_grades(@RequestParam int s_id) {
+    course_l.con = db_config.getCon();
+    Object result = course_l.retrieve_student_grades(s_id);
+    return result;
+  }
+  
+  // Retrieve student grades
+  @GetMapping("/student_gpa")
+  public Object calculate_gpa(@RequestParam int s_id) {
+    course_l.con = db_config.getCon();
+    Object result = course_l.student_gpa(s_id);
+    return result;
+  }
+
 
   // POST HTTP REQUESTS
   

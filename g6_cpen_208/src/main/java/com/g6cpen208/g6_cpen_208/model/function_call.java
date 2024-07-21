@@ -45,7 +45,7 @@ public class function_call {
     String result = null;
     String SQL = "SELECT admin.authenticate_user(?, ?)";
     Connection conn = con;
-
+    
     try {
       PreparedStatement pstmt = conn.prepareStatement(SQL);
       pstmt.setString(1, id);
@@ -65,10 +65,65 @@ public class function_call {
         }
       }
     }
-
+    
     return result;
   };    
+  
+  // outstanding fees
+  public String retrieve_student_grades(@RequestParam int s_id){
+    String result = null;
+    String SQL = "SELECT student.retrieve_student_grades(?);";
+    Connection conn = con;
 
+    try {
+      PreparedStatement pstmt = conn.prepareStatement(SQL);
+      pstmt.setInt(1, s_id);
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        result = rs.getString("retrieve_student_grades");
+      }
+    } catch (SQLException e) {
+     System.out.println(e.getMessage());
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+
+    return result;
+  };
+  
+  // outstanding fees
+  public String student_gpa(@RequestParam int s_id){
+    String result = null;
+    String SQL = "SELECT student.calculate_gpa(?);";
+    Connection conn = con;
+
+    try {
+      PreparedStatement pstmt = conn.prepareStatement(SQL);
+      pstmt.setInt(1, s_id);
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        result = rs.getString("calculate_gpa");
+      }
+    } catch (SQLException e) {
+     System.out.println(e.getMessage());
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+
+    return result;
+  };
 
   // POST FUNCTIONS
   
