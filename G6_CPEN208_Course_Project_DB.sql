@@ -342,12 +342,16 @@ BEGIN
     -- Check in student_data
     IF EXISTS (SELECT 1 FROM student.student_data WHERE email = uemail AND password = upassword) THEN
         user_type := 'student';
+		select student_id into user_id from student.student_data where email = uemail; 
+	
     -- Check in staff_data
     ELSIF EXISTS (SELECT 1 FROM staff.staff_data WHERE email = uemail AND password = upassword) THEN
         user_type := 'staff';
+		select staff_id into user_id from staff.staff_data where email = uemail; 
     -- Check in admin_data
     ELSIF EXISTS (SELECT 1 FROM admin.admin_data WHERE email = uemail AND password = upassword) THEN
         user_type := 'admin';
+		select admin_id into user_id from admin.admin_data where email = uemail; 
     ELSE
         RETURN json_build_object('status', 'error', 'message', 'Invalid credentials');
     END IF;
@@ -588,6 +592,7 @@ $$ LANGUAGE plpgsql;
 SELECT student.calculate_gpa(11111111);
 
 -- Function in admin schema to Retrieve Course Information
+-- \/
 CREATE OR REPLACE FUNCTION admin.retrieve_course_info(c_id INT)
 RETURNS JSON AS $$
 DECLARE
@@ -613,6 +618,7 @@ SELECT admin.retrieve_course_info(11111111);
 
 
 -- Function in admin schema to Assign a Lecturer to a Course
+-- x
 CREATE OR REPLACE FUNCTION admin.assign_lecturer(assignment_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -638,6 +644,7 @@ SELECT admin.assign_lecturer('{"staff_id": 11111111, "course_id": 11111111}');
 
 
 -- Function in staff schema to Get Lecturer's Course Assignments
+-- \/
 CREATE OR REPLACE FUNCTION staff.get_lecturer_courses(s_id INT)
 RETURNS JSON AS $$
 DECLARE
@@ -664,6 +671,7 @@ SELECT staff.get_lecturer_courses(11111111);
 
 
 -- Function in staff schema to assign score in course_enrollment table
+-- x
 CREATE OR REPLACE FUNCTION staff.assign_score(score_info JSON)
 RETURNS JSON AS $$
 BEGIN
@@ -683,6 +691,7 @@ SELECT staff.assign_score('{"enrollment_id": 11111111, "score": 85}');
 
 
 -- Function in student schema to Retrieve Payment History for a Student
+-- \/
 -- DROP FUNCTION student.retrieve_payment_history(INT);
 CREATE OR REPLACE FUNCTION student.retrieve_payment_history(s_id INT)
 RETURNS JSON AS $$
@@ -709,6 +718,7 @@ SELECT student.retrieve_payment_history(11111111);
 
 
 -- Function to get the class list for a specific course
+-- \/
 -- DROP FUNCTION staff.get_classlist(INT);
 CREATE OR REPLACE FUNCTION staff.get_classlist(c_id INT)
 RETURNS JSON AS $$
@@ -753,6 +763,7 @@ SELECT staff.get_classlist(11111113);
 
 
 -- Outstanding Fees
+-- \/
 CREATE OR REPLACE FUNCTION student.calculate_outstanding_fees(s_id INT, acad_year INT)
 RETURNS NUMERIC(15,2) AS $$
 DECLARE
@@ -780,3 +791,66 @@ $$ LANGUAGE plpgsql;
 
 -- USE CASE
 SELECT student.calculate_outstanding_fees(11111111, 2022);
+
+-- View student_info
+-- \/
+CREATE OR REPLACE FUNCTION student.view_student_info(s_id INT)
+RETURNS JSON AS $$
+DECLARE
+    student_info JSON;
+BEGIN
+    SELECT row_to_json(t)
+    INTO student_info
+    FROM (
+        SELECT student_id, fname, lname, oname, email, phone, dob, profile_img, level
+        FROM student.student_data
+        WHERE student_id = s_id
+    ) t;
+    RETURN student_info;
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT student.view_student_info(11111112);
+
+-- View staff_info
+-- \/
+CREATE OR REPLACE FUNCTION staff.view_staff_info(s_id INT)
+RETURNS JSON AS $$
+DECLARE
+    staff_info JSON;
+BEGIN
+    SELECT row_to_json(t)
+    INTO staff_info
+    FROM (
+        SELECT staff_id, fname, lname, oname, email, phone, dob, profile_img
+        FROM staff.staff_data
+        WHERE staff_id = s_id
+    ) t;
+    RETURN staff_info;
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT staff.view_staff_info(11111112);
+
+
+-- View admin_info
+CREATE OR REPLACE FUNCTION admin.view_admin_info(a_id INT)
+RETURNS JSON AS $$
+DECLARE
+    admin_info JSON;
+BEGIN
+    SELECT row_to_json(t)
+    INTO admin_info
+    FROM (
+        SELECT admin_id, fname, lname, oname, email, phone, dob, role
+        FROM admin.admin_data
+        WHERE admin_id = a_id
+    ) t;
+    RETURN admin_info;
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT admin.view_admin_info(11111112);
