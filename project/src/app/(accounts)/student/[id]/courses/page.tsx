@@ -1,13 +1,23 @@
+"use client";
 
+import { useParams } from "next/navigation";
 
-const page = () => {
+const CoursePage = () => {
+  const params = useParams();
   return (
-    <div >
-        <main>
-      <h1>Course</h1>
+    <div>
+      <main>
+        <h1>Course</h1>
+        <button
+          onClick={() => {
+            console.log(params.id);
+          }}
+        >
+          Params
+        </button>
       </main>
     </div>
   );
 };
 
-export default page;
+export default CoursePage;

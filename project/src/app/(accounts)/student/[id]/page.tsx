@@ -6,6 +6,8 @@ import CourseDashboard from '@/components/dashboard/DashboardForm';
 import GetDate from '@/components/dashboard/Getdate';
 import { getTime } from '@/components/dashboard/getTime';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 type Props = {
   params: {
@@ -15,6 +17,7 @@ type Props = {
 
 const Dashboard = ({params}:Props) => {
   const timeOfDay = getTime();
+
   return (
     <div >
       {/* Sidebar */}
@@ -42,7 +45,7 @@ const Dashboard = ({params}:Props) => {
     <div className="mb-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold">Your courses</h3>
-              <a href="/courses" className="text-sm text-blue-600">View All</a>
+              <Link href={`/student/${params.id}/courses`} className="text-sm text-blue-600">View All</Link>
             </div>
             <Card className="bg-white shadow-sm mb-4">
               <CardContent className="p-4 flex items-center">
@@ -72,7 +75,7 @@ const Dashboard = ({params}:Props) => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-lg font-semibold">Course Task</CardTitle>
-                <a href="/assignments" className="text-sm text-blue-600">View All</a>
+                <Link href={`/student/${params.id}/finance`}  className="text-sm text-blue-600">View All</Link>
               </div>
             </CardHeader>
             <CardContent>
