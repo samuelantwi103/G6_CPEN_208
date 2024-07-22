@@ -320,8 +320,86 @@ public class function_call {
 
     return result;
   };
+  
+  // Get Admin Info
+  public String enrollment_courses(){
+    String result = null;
+    String SQL = "SELECT student.get_courses_with_lecturers();";
+    Connection conn = con;
+
+    try {
+      PreparedStatement pstmt = conn.prepareStatement(SQL);
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        result = rs.getString("get_courses_with_lecturers");
+      }
+    } catch (SQLException e) {
+     System.out.println(e.getMessage());
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+
+    return result;
+  };
 
 
   // POST FUNCTIONS
-  
+  // Sign Up Student
+  public String sign_up_student(String json_request) {
+    String result = null;
+    String SQL = "SELECT student.sign_up_student(?::JSON);";
+    Connection conn = con;
+    try {
+      PreparedStatement pstmt = conn.prepareStatement(SQL);
+      pstmt.setString(1, json_request);
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        result = rs.getString("sign_up_student");
+      }
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+    return result;
+  }
+
+
+  // Sign Up Student
+  public String add_course(String json_request) {
+    String result = null;
+    String SQL = "SELECT admin.add_course(?::JSON);";
+    Connection conn = con;
+    try {
+      PreparedStatement pstmt = conn.prepareStatement(SQL);
+      pstmt.setString(1, json_request);
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        result = rs.getString("add_course");
+      }
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+    return result;
+  }
 }

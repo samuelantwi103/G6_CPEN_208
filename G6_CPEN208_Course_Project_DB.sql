@@ -301,7 +301,7 @@ Below are the SQL statements for these functions:
 
 
 -- Function in student schema to sign up student to student_data table
--- x
+-- \/
 CREATE OR REPLACE FUNCTION student.sign_up_student(student_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -394,6 +394,39 @@ $$ LANGUAGE plpgsql;
 -- USE CASE
 SELECT admin.add_staff('{"fname": "John", "lname": "Asiamah", "oname": null, "email": "jasiamah@ug.edu.gh", "phone": "0547854321", "password": "password123", "dob": "1992-02-02", "profile_img": null }');
 
+-- ADD COURSES TO DB
+CREATE OR REPLACE FUNCTION admin.add_course(
+	course_info json)
+    RETURNS json
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    result JSON;
+BEGIN
+    INSERT INTO admin.course_data (course_id, course_code, course_name, credit_hour, semester, academic_year, description, img)
+    VALUES (
+        (SELECT COALESCE(MAX(course_id), 11111110) + 1 FROM admin.course_data),
+        course_info->>'course_code',
+        course_info->>'course_name',
+        CAST(course_info->>'credit_hour' AS INT),
+        CAST(course_info->>'semester' AS INT),
+        CAST(course_info->>'academic_year' AS INT),
+        course_info->>'description',
+        course_info->>'img'
+    )
+    RETURNING course_id INTO result;
+    
+    RETURN json_build_object('status', 'success', 'course_id', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$BODY$;
+
+-- USE CASE
+SELECT admin.add_course('{"course_code":"CPEN 206", "course_name":"Linear Circuits", "credit_hour":3, "semester":2, "academic_year":"2024", "description":"Learn more about analogue Linear Circuits. Get to know how to build operational amplifiers, filter circuits and other basic network theorems. Finally work on a practical course project for proof of concept.", "img":null}')
 
 -- Function in student schema to Enroll a Student in a Course
 -- x
@@ -854,3 +887,47 @@ $$ LANGUAGE plpgsql;
 
 -- USE CASE
 SELECT admin.view_admin_info(11111112);
+
+-- Get All Courses for students before enrolling
+-- \/
+CREATE OR REPLACE FUNCTION student.get_courses_with_lecturers()
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    SELECT json_agg(course_info) INTO result
+    FROM (
+        SELECT
+            c.course_id,
+            c.course_code,
+            c.course_name,
+            c.credit_hour,
+            c.academic_year,
+            c.semester,
+            c.description,
+            c.img,
+            (
+                SELECT json_agg(lecturer_info)
+                FROM (
+                    SELECT
+                        l.staff_id,
+                        l.fname,
+                        l.lname,
+                        l.oname,
+                        l.email,
+                        l.phone,
+                        l.profile_img
+                    FROM staff.staff_data l
+                    JOIN staff.lecturer_assignment la ON la.staff_id = l.staff_id
+                    WHERE la.course_id = c.course_id
+                ) AS lecturer_info
+            ) AS lecturers
+        FROM admin.course_data c
+    ) AS course_info;
+
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+-- USE CASE
+SELECT student.get_courses_with_lecturers();

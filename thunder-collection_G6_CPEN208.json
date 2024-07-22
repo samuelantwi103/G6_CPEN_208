@@ -1,0 +1,281 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "G6_CPEN208",
+    "collectionId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+    "dateExported": "2024-07-22T07:54:53.494Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "228142bb-5197-48b6-88d0-3d28430cd708",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-authenticate user",
+            "url": "http://localhost:8002/course_service/auth_user?id=jasiamah@ug.edu.gh&password=password123",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2024-07-21T23:03:04.420Z",
+            "modified": "2024-07-21T23:03:04.420Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "jasiamah@ug.edu.gh",
+                    "isPath": false
+                },
+                {
+                    "name": "password",
+                    "value": "password123",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "d3b83f85-4432-4534-9d0f-fea8b98e91fa",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-staff info",
+            "url": "http://localhost:8002/course_service/staff_info?s_id=11111114",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2024-07-21T23:03:24.561Z",
+            "modified": "2024-07-21T23:03:24.561Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "s_id",
+                    "value": "11111114",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "21a47ada-4782-4f2e-acfa-2a7a63f3496d",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-staff info",
+            "url": "http://localhost:8002/course_service/staff_info?s_id=11111114",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2024-07-21T23:03:34.363Z",
+            "modified": "2024-07-21T23:03:34.363Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "s_id",
+                    "value": "11111114",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "fdf709a8-3bb0-4235-8283-794b2b0a3eaf",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-admin info",
+            "url": "http://localhost:8002/course_service/admin_info?s_id=11111113",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2024-07-21T23:03:53.541Z",
+            "modified": "2024-07-21T23:03:53.541Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "s_id",
+                    "value": "11111113",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "709b3aa0-0296-4c5a-abd0-7a67f1e085b7",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-outstanding fees",
+            "url": "http://localhost:8002/course_service/yearly_outstanding_fees?s_id=11111113&acad_year=2023",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2024-07-21T23:04:04.100Z",
+            "modified": "2024-07-21T23:04:04.100Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "s_id",
+                    "value": "11111113",
+                    "isPath": false
+                },
+                {
+                    "name": "acad_year",
+                    "value": "2023",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "19484eb3-0556-4a39-bdb7-895083e96494",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-students grade",
+            "url": "http://localhost:8002/course_service/student_grades?s_id=11111111",
+            "method": "GET",
+            "sortNum": 60000,
+            "created": "2024-07-21T23:04:19.319Z",
+            "modified": "2024-07-21T23:04:19.319Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "s_id",
+                    "value": "11111111",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "ceb26ece-20ca-478c-8007-bad0049e5d27",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-students gpa",
+            "url": "http://localhost:8002/course_service/student_gpa?s_id=11111111",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2024-07-21T23:04:28.794Z",
+            "modified": "2024-07-21T23:04:28.794Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "s_id",
+                    "value": "11111111",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "614bc926-151e-4f58-a0b1-87c6ea27d83d",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-course info",
+            "url": "http://localhost:8002/course_service/course_info?c_id=11111111",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2024-07-21T23:04:44.371Z",
+            "modified": "2024-07-21T23:04:44.371Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "c_id",
+                    "value": "11111111",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "17397d4b-bd3e-4a08-be9f-42398d4b74cf",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-lecturer courses",
+            "url": "http://localhost:8002/course_service/lecturer_courses?s_id=11111111",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2024-07-21T23:04:54.900Z",
+            "modified": "2024-07-21T23:04:54.900Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "s_id",
+                    "value": "11111111",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "eeb9cac4-ddbb-4bbb-b60a-8fdfd0e01267",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-get classlist",
+            "url": "http://localhost:8002/course_service/get_classlist?c_id=11111113",
+            "method": "GET",
+            "sortNum": 100000,
+            "created": "2024-07-21T23:05:05.728Z",
+            "modified": "2024-07-21T23:05:05.728Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "c_id",
+                    "value": "11111113",
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "9140a34a-a49d-4e4a-9f61-c05046ee9f09",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-enrollment_courses",
+            "url": "http://localhost:8002/course_service/enrollment_courses",
+            "method": "GET",
+            "sortNum": 110000,
+            "created": "2024-07-22T06:47:15.938Z",
+            "modified": "2024-07-22T06:47:15.938Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "s_id",
+                    "value": "11111111",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "b3eaa29d-8c00-4f14-a3f8-bf28e9544baa",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-sign_up student",
+            "url": "http://localhost:8002/course_service/sign_up_student",
+            "method": "POST",
+            "sortNum": 120000,
+            "created": "2024-07-22T06:47:24.621Z",
+            "modified": "2024-07-22T06:47:24.621Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "s_id",
+                    "value": "11111111",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"fname\": \"Roland\", \n  \"lname\": \"Berko\", \n  \"oname\": \"Anane\", \n  \"email\": \"jane.doe@st.ug.edu.gh\", \n  \"phone\": \"0547654321\", \n  \"password\": \"password123\", \n  \"dob\": \"2001-02-02\", \n  \"profile_img\": null, \n  \"level\": 300\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "f3304052-e1d9-48cf-8534-fda304ee580c",
+            "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
+            "containerId": "",
+            "name": "G6-add course",
+            "url": "http://localhost:8002/course_service/add_course",
+            "method": "POST",
+            "sortNum": 130000,
+            "created": "2024-07-22T07:39:10.940Z",
+            "modified": "2024-07-22T07:46:59.772Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "s_id",
+                    "value": "11111111",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"course_code\":\"CPEN 206\", \n  \"course_name\":\"Linear Circuits\",\n  \"credit_hour\":\"3\", \"semester\":2,\n  \"academic_year\":\"2024\", \n  \"description\":\"Learn more about analogue Linear Circuits. Get to know how to build operational amplifiers, filter circuits and other basic network theorems. Finally work on a practical course project for proof of concept.\", \n  \"img\":null\n}",
+                "form": []
+            }
+        }
+    ],
+    "ref": "94TXx28Rlovr0TjD6wphIBtv2BTIZi6uK8y00DOz-RuAbUffgZWbWs3uFZb5kSkhgAi5bZMzhUbcvcxpEV-9Hg"
+}

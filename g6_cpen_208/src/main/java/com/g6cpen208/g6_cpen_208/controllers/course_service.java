@@ -2,6 +2,8 @@ package com.g6cpen208.g6_cpen_208.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -105,8 +107,30 @@ public class course_service {
     Object result = course_l.admin_info(s_id);
     return result;
   }
+  
+  // Get Admin Info
+  @GetMapping("/enrollment_courses")
+  public Object enrollment_courses() {
+    course_l.con = db_config.getCon();
+    Object result = course_l.enrollment_courses();
+    return result;
+  }
 
 
   // POST HTTP REQUESTS
-  
+  // Student SignUp
+  @PostMapping("/sign_up_student")
+  public String sign_up_student(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.sign_up_student(json_request);
+    return result;
+  }
+
+  // ADD COURSES
+  @PostMapping("/add_course")
+  public String add_course(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.add_course(json_request);
+    return result;
+  }
 }
