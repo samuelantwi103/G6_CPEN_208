@@ -32,7 +32,7 @@ const Dashboard = ({params}:Props) => {
 
     <div className="p-0 bg-gray-100">
     {/* // calling GetDate function from GetDate.tsx */}
-    <GetDate/>
+    <GetDate params={params}/>
     {/* // div class to display a message based on the time of the day */}
     <div className="mb-6">
     <h2 className="text-2xl font-bold">Good {timeOfDay} {params.id} 😂!</h2>

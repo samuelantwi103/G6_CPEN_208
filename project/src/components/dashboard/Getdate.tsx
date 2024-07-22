@@ -1,8 +1,16 @@
 "use client";
 import React, {useState, useEffect} from 'react';
 import { Search, Bell} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-const GetDate = () => {
+type Props = {
+  params: {
+    id: string;
+  };
+};
+
+const GetDate = ({params}:Props) => {
   // This function gets the current time and date
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
@@ -50,7 +58,8 @@ const GetDate = () => {
           <p className="text-sm text-gray-600 ">{formatDate(currentDateTime)}</p>
           <p className="text-sm text-gray-600">{formatTime(currentDateTime)}</p>
           <Bell className="text-gray-600" size={20} />
-          <a href="/profile"><img src="/noavatar.jpg" alt="Placeholder" className="w-8 h-8 rounded-full"/> </a>
+          <Link href={`${params.id}/profile`}>
+          <Image src="/noavatar.jpg" alt="Placeholder" className="w-8 h-8 rounded-full" width={32} height={32}/>  </ Link>
 
         </div>
         
