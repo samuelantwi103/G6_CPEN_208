@@ -1,12 +1,7 @@
 package com.g6cpen208.g6_cpen_208.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.g6cpen208.g6_cpen_208.db_connector.db_layer;
 import com.g6cpen208.g6_cpen_208.model.function_call;
@@ -29,10 +24,12 @@ public class course_service {
   }
   
   // Authenticate User
+  @CrossOrigin(origins = "*")
   @GetMapping("/auth_user")
   public Object auth_user(@RequestParam String id, @RequestParam String password) {
     course_l.con = db_config.getCon();
     Object result = course_l.authenticate_user(id, password);
+
     return result;
   }
   
@@ -41,6 +38,7 @@ public class course_service {
   public Object retrieve_student_grades(@RequestParam int s_id) {
     course_l.con = db_config.getCon();
     Object result = course_l.retrieve_student_grades(s_id);
+
     return result;
   }
   
@@ -119,6 +117,7 @@ public class course_service {
 
   // POST HTTP REQUESTS
   // Student SignUp
+  @CrossOrigin(origins = "*")
   @PostMapping("/sign_up_student")
   public String sign_up_student(@RequestBody String json_request) {
     course_l.con = db_config.getCon();

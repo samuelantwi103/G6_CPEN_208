@@ -4,10 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { FolderPen, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { signIn } from "next-auth/react";
+import axios from "axios";
 
 const schema = z.object({
-  student_id: z.string().min(8,  "Invalid Student ID").max(8, "Invalid Student ID"),
+  email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -24,27 +26,28 @@ const SignInForm = () => {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    console.log(data);
-    // try {
-    //   const response = await axios.post(
-    //     "http://localhost:20201/api/login",
-    //     data,
-    //     {
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     }
-    //   );
-
-    //   if (response.status === 200) {
-    //     router.push("/dashboard");
-    //   } else {
-    //     console.error("Login failed");
-    //   }
-    // } catch (e) {
-    //   console.error("Error:", e);
-    // }
+    const endpoint = `http://localhost:8002/course_service/auth_user?id=${data.email}&password=${data.password}`;
+    const response = await axios.get(endpoint)
+    .then(response => {
+      if (response.data.status === 'success') {
+        console.log('Login successful:', response.data);
+        // Redirect to the dashboard
+        window.location.href = '/';
+      } else {
+        console.log('Login failed:', response.data);
+        // Handle login failure
+      }
+    })
+    .catch(error => {
+      console.error(`Error! ${error}`);
+    });
+  // console.log(response);
+  
+  
+  
   };
+  
+
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-blue-200">
@@ -54,15 +57,15 @@ const SignInForm = () => {
         <p className="text-center text-gray-600 mb-6">Login into page</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="relative">
-            <FolderPen className="absolute left-3 top-3 text-gray-400" size={20} />
+            <Mail className="absolute left-3 top-3 text-gray-400" size={20} />
             <input
-              {...register("student_id")}
-              type="text"
-              placeholder="Student ID"
+              {...register("email")}
+              type="email"
+              placeholder="Johndoe@gmail.com"
               className="w-full pl-10 pr-3 py-2 border rounded-md"
             />
           </div>
-          {errors.student_id && <p className="text-red-500 text-sm">{errors.student_id.message}</p>}
+          {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
           
           <div className="relative">
             <Lock className="absolute left-3 top-3 text-gray-400" size={20} />

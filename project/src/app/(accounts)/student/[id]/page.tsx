@@ -2,12 +2,13 @@
 import React from 'react';
 import { LayoutGrid, User, DollarSign, BookOpen, FileText, Calendar, LogOut, Book, ChevronRight } from 'lucide-react';
 import Sidebar from '@/components/sidebar/Sidebar';
-import CourseDashboard from '@/components/dashboard/DashboardForm';
 import GetDate from '@/components/dashboard/Getdate';
 import { getTime } from '@/components/dashboard/getTime';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
+// import { getStudentGrades } from '@/utils/[...nextauth]/student_api';
 
 type Props = {
   params: {
@@ -17,6 +18,7 @@ type Props = {
 
 const Dashboard = ({params}:Props) => {
   const timeOfDay = getTime();
+
 
   return (
     <div >
@@ -49,7 +51,7 @@ const Dashboard = ({params}:Props) => {
             </div>
             <Card className="bg-white shadow-sm mb-4">
               <CardContent className="p-4 flex items-center">
-                <div className="w-12 h-12 bg-gray-200 rounded-lg mr-4"></div>
+              <Link href={`/student/${params.id}/courses`}><Image src="/books.jpg" alt="Placeholder" width={48} height={48} className="w-12 h-12 bg-gray-200 rounded-lg mr-4"/> </Link>
                 <div>
                   <p className="font-semibold">Course One</p>
                   <p className="text-xs text-gray-500">12 lessons • 6h 30min • Beginner</p>
@@ -60,7 +62,7 @@ const Dashboard = ({params}:Props) => {
             
             <Card className="bg-white shadow-sm">
               <CardContent className="p-4 flex items-center">
-                <div className="w-12 h-12 bg-gray-200 rounded-lg mr-4"></div>
+              <Link href={`/student/${params.id}/courses`}><Image src="/books.jpg" alt="Placeholder" width={48} height={48}  className="w-12 h-12 bg-gray-200 rounded-lg mr-4"/> </Link>
                 <div>
                   <p className="font-semibold">Course Two</p>
                   <p className="text-xs text-gray-500">8 lessons • 4h 15min • Beginner</p>

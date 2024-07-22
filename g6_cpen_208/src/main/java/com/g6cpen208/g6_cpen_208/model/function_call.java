@@ -5,8 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+@Service
 public class function_call {
   public Connection con = null;
 
@@ -123,6 +125,7 @@ public class function_call {
     }
 
     return result;
+
   };
   
   // Retrieve Course Info

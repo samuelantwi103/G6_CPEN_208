@@ -9,13 +9,15 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Mail, Lock, User, Phone, FolderPen, Calendar } from 'lucide-react';
 
 const schema = z.object({
-    student_id: z.string().min(8,  "Invalid Student ID").max(8, "Invalid Student ID"),
-    firstName: z.string().min(4,"First name is required"),
-    lastName: z.string().min(4,  "Last name is required"),  
-    otherName: z.string(), 
-    phoneNumber: z.string(),  
-    date: z.string().transform((str) => new Date(str)),
+    // student_id: z.string().min(8,  "Invalid Student ID").max(8, "Invalid Student ID"),
+    fname: z.string().min(4,"First name is required"),
+    lname: z.string().min(4,  "Last name is required"),  
+    oname: z.string(), 
+    phone: z.string(),  
+    profile_img: z.string(), 
+    dob: z.string().transform((str) => new Date(str)),
     email: z.string().email("Invalid email address"),
+    level: z.string(), 
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -38,31 +40,28 @@ const SignUpForm = () => {
 
   const onSubmit = async (data: FormData) => {
     // const hash = await bcrypt.hash(data.password, 10);
-    // const userData = {
-    //   email: data.email,
-    //   password: hash,
-    // };
+    
     console.log(data);
 
-    // try {
-    //   const response = await axios.post(
-    //     "http://localhost:20201/api/students",
-    //     userData,
-    //     {
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     }
-    //   );
-
-    //   if (response.status === 201) {
-    //     router.push("/signIn");
-    //   } else {
-    //     console.error("Error creating account");
-    //   }
-    // } catch (e) {
-    //   console.error("Error:", e);
-    // }
+    try {
+      const response = await axios.post(
+        "http://localhost:8002/course_service/sign_up_student",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+console.log(response);
+      if (response.status === 201 || response.status === 200) {
+        router.push("/");
+      } else {
+        console.error("Error creating account");
+      }
+    } catch (e) {
+      console.error("Error:", e);
+    }
   };
 
   return (
@@ -73,66 +72,77 @@ const SignUpForm = () => {
         <p className="text-center text-gray-600 mb-6">Let&apos;s create your account</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           
-          <div className="relative">
-            <FolderPen className="absolute left-3 top-3 text-gray-400" size={20} />
-            <input
-              {...register("student_id")}
-              type="text"
-              placeholder="Student ID"
-              className="w-full pl-10 pr-3 py-2 border rounded-md"
-            />
-          </div>
-          {errors.student_id && <p className="text-red-500 text-sm">{errors.student_id.message}</p>}
+      
           <div className="relative">
             <User className="absolute left-3 top-3 text-gray-400" size={20} />
             <input
-              {...register("firstName")}
+              {...register("fname")}
               type="text"
               placeholder="First name"
               className="w-full pl-10 pr-3 py-2 border rounded-md"
             />
           </div>
-          {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
+          {errors.fname && <p className="text-red-500 text-sm">{errors.fname.message}</p>}
           <div className="relative">
             <User className="absolute left-3 top-3 text-gray-400" size={20} />
             <input
-              {...register("lastName")}
+              {...register("lname")}
               type="text"
               placeholder="Last name"
               className="w-full pl-10 pr-3 py-2 border rounded-md"
             />
           </div>
-          {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
+          {errors.lname && <p className="text-red-500 text-sm">{errors.lname.message}</p>}
           <div className="relative">
             <User className="absolute left-3 top-3 text-gray-400" size={20} />
             <input
-              {...register("otherName")}
+              {...register("oname")}
               type="text"
               placeholder="Other name"
               className="w-full pl-10 pr-3 py-2 border rounded-md"
             />
           </div>
-          {errors.otherName && <p className="text-red-500 text-sm">{errors.otherName.message}</p>}
+          {errors.oname && <p className="text-red-500 text-sm">{errors.oname.message}</p>}
+          <div className="relative">
+            <User className="absolute left-3 top-3 text-gray-400" size={20} />
+            <input
+              {...register("level")}
+              type="text"
+              placeholder="Level"
+              className="w-full pl-10 pr-3 py-2 border rounded-md"
+            />
+          </div>
+          {errors.level && <p className="text-red-500 text-sm">{errors.level.message}</p>}
+          <div className="relative">
+            <User className="absolute left-3 top-3 text-gray-400" size={20} />
+            <input
+              {...register("profile_img")}
+              type="text"
+              placeholder="profile image"
+              className="w-full pl-10 pr-3 py-2 border rounded-md"
+            />
+          </div>
+          {errors.profile_img && <p className="text-red-500 text-sm">{errors.profile_img.message}</p>}
           <div className="relative">
             <Phone className="absolute left-3 top-3 text-gray-400" size={20} />
             <input
-              {...register("phoneNumber")}
+              {...register("phone")}
               type="text"
               placeholder="Phone Numer"
               className="w-full pl-10 pr-3 py-2 border rounded-md"
             />
           </div>
-          {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
+          {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
           <div className="relative">
             <Calendar  className="absolute left-3 top-3 text-gray-400" size={20} />
             <input
-              {...register("date")}
+              {...register("dob")}
               type="date"
               placeholder="Date of Birth"
               className="w-full pl-10 pr-3 py-2 border rounded-md text-black"
             />
           </div>
-          {errors.date && <p className="text-red-500 text-sm">{errors.date.message}</p>}
+          {errors.dob && <p className="text-red-500 text-sm">{errors.dob.message}</p>}
           <div className="relative">
             <Mail className="absolute left-3 top-3 text-gray-400" size={20} />
             <input
