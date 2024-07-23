@@ -1,5 +1,8 @@
 // // import { api } from '@utils/api.ts';
 
+import axios from "axios";
+import { GetStaticProps } from "next";
+
 // import api from "./api";
 
 
@@ -97,3 +100,6 @@
 // // const grade: Grade = getStudentGrades('11111111').grades;
 
 
+
+
+    

@@ -83,6 +83,7 @@ public class course_service {
   }
   
   // Get Student Info
+  @CrossOrigin(origins = "*")
   @GetMapping("/student_info")
   public Object student_info(@RequestParam int s_id) {
     course_l.con = db_config.getCon();

@@ -1,5 +1,5 @@
-"use client";
-import React , {useEffect, useState} from 'react';
+// pages/index.js
+import React , {useEffect} from 'react';
 import { LayoutGrid, User, DollarSign, BookOpen, FileText, Calendar, LogOut, Book, ChevronRight } from 'lucide-react';
 import Sidebar from '@/components/sidebar/Sidebar';
 import GetDate from '@/components/dashboard/Getdate';
@@ -14,36 +14,19 @@ import axios from 'axios';
 
 type Props = {
   params: {
-    id: string,
-    email: string,
+    id: string;
   };
 };
 
-interface studentType {
-  fname: string;
-  lname: string;
-  courseDescription: string;
-}
 const Dashboard = ({params}:Props) => {
   const timeOfDay = getTime();
-  const [studentInfo, setStudentInfo] = useState<studentType | null>(null);
- 
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8002/course_service/student_info?s_id=${params.id}`);
-        setStudentInfo(response.data); // Update state with fetched data
-      } catch (error) {
-        console.error(error);
-      }
-    };
-  
-    fetchData();
-  }, [params.id]);
- 
+    axios.get(`http://localhost:8002/course_service/student/retrieveStudentGrades?id=${params.id}`)
+    .then(response => console.log(response))
+    .catch(error => console.log(error));
+},[])
   return (
-  
     <div >
       
       {/* Sidebar */}
@@ -56,12 +39,12 @@ const Dashboard = ({params}:Props) => {
   
 
 
-      <div className="p-0 bg-gray-100">
-      {/* // calling GetDate function from GetDate.tsx */}
-      <GetDate params={params}/>
-      {/* // div class to display a message based on the time of the day */}
-      <div className="mb-6">
-      <h2 className="text-2xl font-bold">Good {timeOfDay} {studentInfo?.lname} 😂!</h2>
+    <div className="p-0 bg-gray-100">
+    {/* // calling GetDate function from GetDate.tsx */}
+    <GetDate params={params}/>
+    {/* // div class to display a message based on the time of the day */}
+    <div className="mb-6">
+    <h2 className="text-2xl font-bold">Good {timeOfDay} {params.id} 😂!</h2>
         {timeOfDay === 'morning' && <p>Time to have a great start to your day!</p>}
         {timeOfDay === 'afternoon' && <p>Hope your day is going well!</p>}
         {timeOfDay === 'evening' && <p>Have a relaxing evening!</p>}
@@ -136,9 +119,7 @@ const Dashboard = ({params}:Props) => {
         {/* Additional dashboard content can be added here */}
       </main>
     </div>
-              
   );
-
 };
 
 export default Dashboard;
