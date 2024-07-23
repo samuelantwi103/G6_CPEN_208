@@ -22,7 +22,13 @@ type Props = {
 interface studentType {
   fname: string;
   lname: string;
-  courseDescription: string;
+  oname: string;
+  student_id: string;
+  email: string;
+  phone: string;
+  dob: string;
+  profile_img: string;
+  level: string;
 }
 const Dashboard = ({params}:Props) => {
   const timeOfDay = getTime();

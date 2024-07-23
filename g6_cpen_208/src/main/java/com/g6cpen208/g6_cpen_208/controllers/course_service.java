@@ -51,6 +51,7 @@ public class course_service {
   }
   
   // Retrieve student grades
+  @CrossOrigin(origins = "*")
   @GetMapping("/course_info")
   public Object course_info(@RequestParam int c_id) {
     course_l.con = db_config.getCon();
@@ -59,6 +60,7 @@ public class course_service {
   }
   
   // Retrieve student grades
+  @CrossOrigin(origins = "*")
   @GetMapping("/lecturer_courses")
   public Object lecturer_courses(@RequestParam int s_id) {
     course_l.con = db_config.getCon();
@@ -67,6 +69,7 @@ public class course_service {
   }
   
   // Payment Grades
+  @CrossOrigin(origins = "*")
   @GetMapping("/payment_history")
   public Object payment_history(@RequestParam int s_id) {
     course_l.con = db_config.getCon();
@@ -75,6 +78,7 @@ public class course_service {
   }
   
   // Get Class list
+  @CrossOrigin(origins = "*")
   @GetMapping("/get_classlist")
   public Object get_classlist(@RequestParam int c_id) {
     course_l.con = db_config.getCon();
