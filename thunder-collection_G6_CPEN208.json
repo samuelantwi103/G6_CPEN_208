@@ -54,7 +54,7 @@
             "colId": "b1e1f527-29e4-4e60-a264-52642f6e7392",
             "containerId": "",
             "name": "G6-staff info",
-            "url": "http://localhost:8002/course_service/staff_info?s_id=11111114",
+            "url": "http://localhost:8002/course_service/student_info?s_id=11111114",
             "method": "GET",
             "sortNum": 30000,
             "created": "2024-07-21T23:03:34.363Z",
