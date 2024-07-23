@@ -32,7 +32,8 @@ const SignInForm = () => {
       if (response.data.status === 'success') {
         console.log('Login successful:', response.data);
         // Redirect to the dashboard
-        window.location.href = '/';
+        window.location.href = `${response.data.user_type}/${response.data.user_id}`;
+        
       } else {
         console.log('Login failed:', response.data);
         // Handle login failure
