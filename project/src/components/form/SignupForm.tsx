@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import { FieldValues, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Mail, Lock, User, Phone, FolderPen, Calendar } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Phone, School, Calendar } from 'lucide-react';
 
 const schema = z.object({
     // student_id: z.string().min(8,  "Invalid Student ID").max(8, "Invalid Student ID"),
@@ -104,7 +104,7 @@ console.log(response);
           </div>
           {errors.oname && <p className="text-red-500 text-sm">{errors.oname.message}</p>}
           <div className="relative">
-            <User className="absolute left-3 top-3 text-gray-400" size={20} />
+            <School className="absolute left-3 top-3 text-gray-400" size={20} />
             <input
               {...register("level")}
               type="text"
@@ -113,7 +113,7 @@ console.log(response);
             />
           </div>
           {errors.level && <p className="text-red-500 text-sm">{errors.level.message}</p>}
-          <div className="relative">
+           {/* <div className="relative">
             <User className="absolute left-3 top-3 text-gray-400" size={20} />
             <input
               {...register("profile_img")}
@@ -122,7 +122,7 @@ console.log(response);
               className="w-full pl-10 pr-3 py-2 border rounded-md"
             />
           </div>
-          {errors.profile_img && <p className="text-red-500 text-sm">{errors.profile_img.message}</p>}
+          {errors.profile_img && <p className="text-red-500 text-sm">{errors.profile_img.message}</p>}*/}
           <div className="relative">
             <Phone className="absolute left-3 top-3 text-gray-400" size={20} />
             <input
