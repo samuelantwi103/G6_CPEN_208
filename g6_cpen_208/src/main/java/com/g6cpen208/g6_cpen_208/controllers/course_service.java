@@ -34,6 +34,7 @@ public class course_service {
   }
   
   // Retrieve student grades
+  @CrossOrigin(origins = "*")
   @GetMapping("/student_grades")
   public Object retrieve_student_grades(@RequestParam int s_id) {
     course_l.con = db_config.getCon();
@@ -43,6 +44,7 @@ public class course_service {
   }
   
   // Retrieve student grades
+  @CrossOrigin(origins = "*")
   @GetMapping("/student_gpa")
   public Object calculate_gpa(@RequestParam int s_id) {
     course_l.con = db_config.getCon();
