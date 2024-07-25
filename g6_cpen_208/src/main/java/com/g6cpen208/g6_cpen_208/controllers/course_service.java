@@ -98,6 +98,7 @@ public class course_service {
   }
   
   // Get Staff Info
+  @CrossOrigin(origins = "*")
   @GetMapping("/staff_info")
   public Object staff_info(@RequestParam int s_id) {
     course_l.con = db_config.getCon();
@@ -106,6 +107,7 @@ public class course_service {
   }
   
   // Get Admin Info
+  @CrossOrigin(origins = "*")
   @GetMapping("/admin_info")
   public Object admin_info(@RequestParam int s_id) {
     course_l.con = db_config.getCon();
@@ -114,6 +116,7 @@ public class course_service {
   }
   
   // Get Admin Info
+  @CrossOrigin(origins = "*")
   @GetMapping("/enrollment_courses")
   public Object enrollment_courses() {
     course_l.con = db_config.getCon();

@@ -28,10 +28,31 @@ type Props = {
 
 const CoursePage = ({ params }: Props) => {
   const [courses, setCourses] = useState<CourseType[]>([]);
+  const [courses1, setCourses1] = useState<CourseType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(`http://localhost:8002/course_service/enrollment_courses`);
+        if (response.data) {
+          setCourses1(response.data);
+        } else {
+          setCourses1([]);
+        }
+      } catch (error) {
+        console.error(error);
+        setError('Failed to fetch courses. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+    
+  },[params.id]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -50,7 +71,8 @@ const CoursePage = ({ params }: Props) => {
       }
     };
     fetchData();
-  }, [params.id]);
+    
+  },[params.id]);
 
   if (isLoading) {
     return (
@@ -109,12 +131,48 @@ const CoursePage = ({ params }: Props) => {
                 </p>
               </div>
             </div>
+            
           ))}
         </div>
       )}
       <div className="mt-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Register for a New Course</h2>
-        <RegisterCourse params={params}/>
+        {/* <RegisterCourse params={params}/> */}
+        {courses1.length === 0 ? (
+        <p className="text-gray-600">You are not registered for any courses yet.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          
+          <table className="min-w-full bg-white">
+            <thead className="bg-gray-100">
+              <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider justify-center"></th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course Code</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Credit Hours</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Academic Year</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semester</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lecturer</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {courses1.map((course) => (
+                <tr key={course.course_id}>
+                  <td  className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"> <input type="checkbox" id={course.course_code} name={course.course_code} /></td>
+                  <td  className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{course.course_code}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{course.course_name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{course.credit_hour}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{course.academic_year}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{course.semester}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {`${course.lecturer_fname} ${course.lecturer_oname}`}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
       </div>
     </div>
   );
