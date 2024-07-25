@@ -5,7 +5,7 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { Book, User, Mail } from 'lucide-react';
+
 
 const schema = z.object({
   course_code: z.string().min(1, "Course code is required"),
