@@ -41,7 +41,7 @@ const SignUpForm = () => {
   const onSubmit = async (data: FormData) => {
     // const hash = await bcrypt.hash(data.password, 10);
     
-    console.log(data);
+    // console.log(data);
 
     try {
       const response = await axios.post(

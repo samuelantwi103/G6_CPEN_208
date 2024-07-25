@@ -133,6 +133,7 @@ public class course_service {
   }
 
   // ADD COURSES
+  @CrossOrigin(origins = "*")
   @PostMapping("/add_course")
   public String add_course(@RequestBody String json_request) {
     course_l.con = db_config.getCon();
