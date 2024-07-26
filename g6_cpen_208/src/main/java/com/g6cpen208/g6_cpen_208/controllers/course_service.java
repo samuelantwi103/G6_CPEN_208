@@ -143,4 +143,49 @@ public class course_service {
     String result  = course_l.add_course(json_request);
     return result;
   }
+
+  // ENROLL INTO COURSES
+  @CrossOrigin(origins = "*")
+  @PostMapping("/enroll_into_course")
+  public String enroll_into_course(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.enroll_into_course(json_request);
+    return result;
+  }
+
+  // ADD A STAFF ACCOUNT
+  @CrossOrigin(origins = "*")
+  @PostMapping("/add_staff")
+  public String add_staff(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.add_staff(json_request);
+    return result;
+  }
+
+  // ADD AN ADMIN ACCOUNT
+  @CrossOrigin(origins = "*")
+  @PostMapping("/add_admin")
+  public String add_admin(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.add_admin(json_request);
+    return result;
+  }
+
+  // MAKE A PAYMENT
+  @CrossOrigin(origins = "*")
+  @PostMapping("/make_payments")
+  public String make_payments(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.make_payments(json_request);
+    return result;
+  }
+
+  // Assign a Lecturer to a course
+  @CrossOrigin(origins = "*")
+  @PostMapping("/assign_lecturer")
+  public String assign_lecturer(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.assign_lecturer(json_request);
+    return result;
+  }
 }

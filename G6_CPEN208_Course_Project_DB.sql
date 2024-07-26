@@ -364,7 +364,7 @@ $$ LANGUAGE plpgsql;
 SELECT admin.authenticate_user('jasiamah@ug.edu.gh', 'password123');
 
 -- Function in admin schema to add staff to staff_data
--- x
+-- \/
 CREATE OR REPLACE FUNCTION admin.add_staff(staff_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -395,6 +395,7 @@ $$ LANGUAGE plpgsql;
 SELECT admin.add_staff('{"fname": "John", "lname": "Asiamah", "oname": null, "email": "jasiamah@ug.edu.gh", "phone": "0547854321", "password": "password123", "dob": "1992-02-02", "profile_img": null }');
 
 -- ADD COURSES TO DB
+-- \/
 CREATE OR REPLACE FUNCTION admin.add_course(
 	course_info json)
     RETURNS json
@@ -429,7 +430,7 @@ $BODY$;
 SELECT admin.add_course('{"course_code":"CPEN 206", "course_name":"Linear Circuits", "credit_hour":3, "semester":2, "academic_year":"2024", "description":"Learn more about analogue Linear Circuits. Get to know how to build operational amplifiers, filter circuits and other basic network theorems. Finally work on a practical course project for proof of concept.", "img":null}')
 
 -- Function in student schema to Enroll a Student in a Course
--- x
+-- \/
 CREATE OR REPLACE FUNCTION student.enroll_student(enrollment_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -455,7 +456,7 @@ $$ LANGUAGE plpgsql;
 SELECT student.enroll_student('{"student_id": 11111114, "course_id": 11111111}');
 
 -- Function in admin schema to add admin to admin_data
--- x
+-- \/
 CREATE OR REPLACE FUNCTION admin.add_admin(admin_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -489,7 +490,7 @@ SELECT admin.add_admin('{"fname": "Bob", "lname": "Johnson", "oname": null, "ema
 
 -- NEXT STOP HERE
 -- Function in student schema to Record a Payment
--- x
+-- \/
 CREATE OR REPLACE FUNCTION student.record_payment(payment_info JSON)
 RETURNS JSON AS $$
 DECLARE
@@ -651,7 +652,7 @@ SELECT admin.retrieve_course_info(11111111);
 
 
 -- Function in admin schema to Assign a Lecturer to a Course
--- x
+-- \/
 CREATE OR REPLACE FUNCTION admin.assign_lecturer(assignment_info JSON)
 RETURNS JSON AS $$
 DECLARE

@@ -405,4 +405,134 @@ public class function_call {
     }
     return result;
   }
+
+  // Enroll Student into a Course
+  public String enroll_into_course(String json_request) {
+    String result = null;
+    String SQL = "SELECT student.enroll_student(?::JSON);";
+    Connection conn = con;
+    try {
+      PreparedStatement pstmt = conn.prepareStatement(SQL);
+      pstmt.setString(1, json_request);
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        result = rs.getString("enroll_student");
+      }
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+    return result;
+  }
+
+  // Add a lecturer
+  public String add_staff(String json_request) {
+    String result = null;
+    String SQL = "SELECT admin.add_staff(?::JSON);";
+    Connection conn = con;
+    try {
+      PreparedStatement pstmt = conn.prepareStatement(SQL);
+      pstmt.setString(1, json_request);
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        result = rs.getString("add_staff");
+      }
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+    return result;
+  }
+
+  // Add another admin
+  public String add_admin(String json_request) {
+    String result = null;
+    String SQL = "SELECT admin.add_admin(?::JSON);";
+    Connection conn = con;
+    try {
+      PreparedStatement pstmt = conn.prepareStatement(SQL);
+      pstmt.setString(1, json_request);
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        result = rs.getString("add_admin");
+      }
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+    return result;
+  }
+
+  // Make payments
+  public String make_payments(String json_request) {
+    String result = null;
+    String SQL = "SELECT student.record_payment(?::JSON);";
+    Connection conn = con;
+    try {
+      PreparedStatement pstmt = conn.prepareStatement(SQL);
+      pstmt.setString(1, json_request);
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        result = rs.getString("record_payment");
+      }
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+    return result;
+  }
+
+  // Assign A lecturer to a course
+  public String assign_lecturer(String json_request) {
+    String result = null;
+    String SQL = "SELECT admin.assign_lecturer(?::JSON);";
+    Connection conn = con;
+    try {
+      PreparedStatement pstmt = conn.prepareStatement(SQL);
+      pstmt.setString(1, json_request);
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        result = rs.getString("assign_lecturer");
+      }
+    } catch (SQLException e) {
+      System.out.println(e.getMessage());
+    } finally {
+      if (conn != null) {
+        try {
+          conn.close();
+        } catch (SQLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    }
+    return result;
+  }
 }

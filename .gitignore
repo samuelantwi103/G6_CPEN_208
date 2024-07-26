@@ -3,3 +3,6 @@ g6_cpen_208/src/main/resources/application.properties
 g6_cpen_208/pom.xml
 g6_cpen_208/src/main/resources/application.properties
 /g6_cpen_208/src/main/resources
+g6_cpen_208/src/main/resources/application.properties
+*.properties
+g6_cpen_208\src\main\resources\application.properties 
