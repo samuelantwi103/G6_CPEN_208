@@ -93,9 +93,9 @@ const Dashboard = ({params}:Props) => {
                       <span className="text-sm">{task}</span>
                     </div>
                 
-                      <a href="/assignments">
+                      <Link href="/assignments">
                         <ChevronRight size={16} className="text-gray-400 transform" />  
-                      </a>
+                      </Link>
 
                   </li>
                 ))}

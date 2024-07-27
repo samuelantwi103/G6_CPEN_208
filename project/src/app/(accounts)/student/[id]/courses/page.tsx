@@ -8,7 +8,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = z.object({
-  selectedCourses: z.array(z.number()).min(1, "Select at least one course."),
+  selectedCourses: z.array(z.string()).min(1, "Select at least one course."),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -34,23 +34,16 @@ type Props = {
   };
 };
 
+
 const CoursePage = ({ params }: Props) => {
   const [courses, setCourses] = useState<CourseType[]>([]);
-  const [courses1, setCourses1] = useState<CourseType[]>([]);
+  const [availableCourses, setAvailableCourses] = useState<CourseType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
-  const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: { selectedCourses: [] },
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema)
   });
 
   const onSubmit = async (data: FormData) => {
@@ -64,7 +57,7 @@ const CoursePage = ({ params }: Props) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8002/course_service/enroll_into_course",
+        `${process.env.NEXT_PUBLIC_API_URL}/course_service/enroll_into_course`,
         enrollmentData,
         {
           headers: {
@@ -74,58 +67,53 @@ const CoursePage = ({ params }: Props) => {
       );
       if (response.data.status === "success") {
         setMessage("Successfully registered for the course(s)!");
-        setMessageType("success");
-        setSelectedCourses([]);
+        console.log("Successfully registered for the course(s)!");
+        alert("Successfully registered for the course(s)!")
+        window.location.reload();
+        // setMessageType("success");
       } else {
         console.error("Error registering for course:", response.data.message);
+        setError(response.data.message || "Registration failed");
+        window.location.reload();
       }
     } catch (e) {
       console.error("Error:", e);
+      setError("Error registering for course. Please try again later.");
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCourses = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(
-          "http://localhost:8002/course_service/enrollment_courses"
-        );
-        if (response.data) {
-          setCourses1(response.data);
-        } else {
-          setCourses1([]);
-        }
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/course_service/enrollment_courses`);
+        setAvailableCourses(response.data || []);
       } catch (error) {
-        console.error(error);
-        setError("Failed to fetch courses. Please try again later.");
+        console.error("Failed to fetch available courses:", error);
+        setError("Failed to fetch available courses. Please try again later.");
       } finally {
         setIsLoading(false);
       }
     };
-    fetchData();
-  }, [params.id]);
+    fetchCourses();
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStudentCourses = async () => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `http://localhost:8002/course_service/student_grades?s_id=${params.id}`
+          `${process.env.NEXT_PUBLIC_API_URL}/course_service/student_grades?s_id=${params.id}`
         );
-        if (response.data.grades) {
-          setCourses(response.data.grades);
-        } else {
-          setCourses([]);
-        }
+        setCourses(response.data.grades || []);
       } catch (error) {
-        console.error(error);
-        setError("Failed to fetch courses. Please try again later.");
+        console.error("Failed to fetch student courses:", error);
+        setError("Failed to fetch student courses. Please try again later.");
       } finally {
         setIsLoading(false);
       }
     };
-    fetchData();
+    fetchStudentCourses();
   }, [params.id]);
 
   if (isLoading) {
@@ -205,13 +193,15 @@ const CoursePage = ({ params }: Props) => {
           ))}
         </div>
       )}
-        butto
+     
+     
+     
       {/* Register for a new course */}
       <div className="mt-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">
           Register for a New Course
         </h2>
-        {courses1.length === 0 ? (
+        {availableCourses.length === 0 ? (
           <p className="text-gray-600">
             No courses available for registration.
           </p>
@@ -221,7 +211,7 @@ const CoursePage = ({ params }: Props) => {
               <table className="min-w-full bg-white rounded-md">
                 <thead className="bg-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 rounded-tl-md  uppercase tracking-wider justify-center"></th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 rounded-tl-md uppercase tracking-wider"></th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Course Code
                     </th>
@@ -242,14 +232,15 @@ const CoursePage = ({ params }: Props) => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200 ">
-                  {courses1.map((course) => (
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {availableCourses.map((course) => (
                     <tr key={course.course_id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <input
                           type="checkbox"
                           {...register("selectedCourses")}
                           value={course.course_id}
+                          id={`course-${course.course_id}`}
                         />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
