@@ -30,12 +30,12 @@ const SignInForm = () => {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    console.log('Info SUbmitted')
+    // console.log('Info SUbmitted')
     const endpoint = `http://localhost:8002/course_service/auth_user?id=${data.email}&password=${data.password}`;
     const response = await axios.get(endpoint)
     .then(response => {
       if (response.data.status === `success`) {
-        console.log('Login successful:', response.data);
+        // console.log('Login successful:', response.data);
       setStudentInfoStored({id: response.data.user_type,type: response.data.user_id})
         window.location.href = `${response.data.user_type}/${response.data.user_id}`;
         

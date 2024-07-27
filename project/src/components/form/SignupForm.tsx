@@ -40,7 +40,7 @@ const SignUpForm = () => {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    // const hash = await bcrypt.hash(data.password, 10);
+    const hash = await bcrypt.hash(data.password, 10);
     
     // console.log(data);
 
@@ -54,8 +54,8 @@ const SignUpForm = () => {
           },
         }
       );
-console.log(response);
-      if (response.data.status === 201 || response.status === 200) {
+        // console.log(response);
+      if (response.status === 201 || response.status === 200) {
         router.push("/");
       } else {
         console.error("Error creating account");
