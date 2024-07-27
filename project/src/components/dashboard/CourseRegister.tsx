@@ -37,28 +37,28 @@ const RegisterCourse = ({params}:Props) => {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    try {
-      const response = await axios.post(
-        `http://localhost:8002/course_service/add_course?s_id=${params.id}`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      // console.log(response);
-      if (response.data.status === 'success') {
-        // router.push("/dashboard");
-        setMessage("Successfully registered for the course!");
-       setMessageType("success");
-      } else {
-        console.error("Error registering for course");
-      }
-    } catch (e) {
-      console.error("Error:", e);
-    }
-    // console.log(data)
+    // try {
+    //   const response = await axios.post(
+    //     `http://localhost:8002/course_service/add_course?s_id=${params.id}`,
+    //     data,
+    //     {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     }
+    //   );
+    //   // console.log(response);
+    //   if (response.data.status === 'success') {
+    //     // router.push("/dashboard");
+    //     setMessage("Successfully registered for the course!");
+    //    setMessageType("success");
+    //   } else {
+    //     console.error("Error registering for course");
+    //   }
+    // } catch (e) {
+    //   console.error("Error:", e);
+    // }
+    console.log(data)
   };
 
   return (

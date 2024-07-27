@@ -7,6 +7,7 @@ import { FieldValues, useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Mail, Lock, User, Phone, School, Calendar } from 'lucide-react';
+import Link from "next/link";
 
 const schema = z.object({
     // student_id: z.string().min(8,  "Invalid Student ID").max(8, "Invalid Student ID"),
@@ -14,7 +15,7 @@ const schema = z.object({
     lname: z.string().min(4,  "Last name is required"),  
     oname: z.string(), 
     phone: z.string(),  
-    profile_img: z.string(), 
+    // profile_img: z.string(), 
     dob: z.string().transform((str) => new Date(str)),
     email: z.string().email("Invalid email address"),
     level: z.string(), 
@@ -39,7 +40,7 @@ const SignUpForm = () => {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    // const hash = await bcrypt.hash(data.password, 10);
+    const hash = await bcrypt.hash(data.password, 10);
     
     // console.log(data);
 
@@ -53,7 +54,7 @@ const SignUpForm = () => {
           },
         }
       );
-console.log(response);
+        // console.log(response);
       if (response.status === 201 || response.status === 200) {
         router.push("/");
       } else {
@@ -198,7 +199,7 @@ console.log(response);
           </button>
         </form>
         <p className="text-xs text-center text-gray-500">
-          Already have an account? <a href="/" className="text-blue-500 font-semibold">Sign In</a>
+          Already have an account? <Link href="/" className="text-blue-500 font-semibold">Sign In</Link>
         </p>
       </div>
     </div>
