@@ -26,9 +26,10 @@ const FinancePage = ({ params }: Props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         const response = await axios.get(`http://localhost:8002/course_service/payment_history?s_id=${params.id}`);
         setStudentInfo(response.data.payments || []);
-        console.log(response.data.payments);
+        // console.log(response.data.payments);
       } catch (error) {
         console.error(error);
       } finally {
@@ -42,7 +43,11 @@ const FinancePage = ({ params }: Props) => {
   const totalAmount = studentInfo.reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
 
   if (isLoading) {
-    return <div className="container mx-auto p-6">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   if (studentInfo.length === 0) {

@@ -1,9 +1,12 @@
 package com.g6cpen208.g6_cpen_208.model;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.mindrot.jbcrypt.BCrypt;
+import org.json.JSONObject;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,21 +46,39 @@ public class function_call {
   };
 
   // Authenticate user
-  public String authenticate_user(@RequestParam String id, String password){
+  public String authenticate_user(@RequestParam String email, String password) {
     String result = null;
     String SQL = "SELECT admin.authenticate_user(?, ?)";
     Connection conn = con;
-    
+
     try {
       PreparedStatement pstmt = conn.prepareStatement(SQL);
-      pstmt.setString(1, id);
-      pstmt.setString(2, password);
+      pstmt.setString(1, email);
+      pstmt.setString(2, password);  // We're still passing the password, but it won't be used for comparison in the DB
       ResultSet rs = pstmt.executeQuery();
-      while (rs.next()) {
-        result = rs.getString("authenticate_user");
+
+      if (rs.next()) {
+        String jsonResult = rs.getString(1);  // Get the JSON result
+        JSONObject authResult = new JSONObject(jsonResult);
+
+        if (authResult.getString("status").equals("pending")) {
+          String storedHash = authResult.getString("stored_hash");
+          if (BCrypt.checkpw(password, storedHash)) {
+            // Password is correct
+            authResult.put("status", "success");
+            authResult.remove("stored_hash");  // Remove the hash before returning
+          } else {
+            // Password is incorrect
+            authResult.put("status", "error");
+            authResult.put("message", "Invalid credentials");
+          }
+        }
+
+        result = authResult.toString();
       }
     } catch (SQLException e) {
-     System.out.println(e.getMessage());
+      System.out.println(e.getMessage());
+      result = "{\"status\": \"error\", \"message\": \"Database error\"}";
     } finally {
       if (conn != null) {
         try {
@@ -67,10 +88,11 @@ public class function_call {
         }
       }
     }
-    
+
     return result;
-  };    
-  
+  }
+
+
   // Student Grades
   public String retrieve_student_grades(@RequestParam int s_id){
     String result = null;
@@ -358,15 +380,33 @@ public class function_call {
     String result = null;
     String SQL = "SELECT student.sign_up_student(?::JSON);";
     Connection conn = con;
+
     try {
+      // Parse the JSON request
+      JSONObject jsonObject = new JSONObject(json_request);
+
+      // Extract the password
+      String password = jsonObject.getString("password");
+
+      // Hash the password
+      String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
+      // Replace the plain password with the hashed password in the JSON
+      jsonObject.put("password", hashedPassword);
+
+      // Convert the modified JSON object back to a string
+      String updatedJsonRequest = jsonObject.toString();
+
       PreparedStatement pstmt = conn.prepareStatement(SQL);
-      pstmt.setString(1, json_request);
+      pstmt.setString(1, updatedJsonRequest);
       ResultSet rs = pstmt.executeQuery();
       while (rs.next()) {
         result = rs.getString("sign_up_student");
       }
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      System.out.println("SQL Error: " + e.getMessage());
+    } catch (Exception e) {
+      System.out.println("Error processing JSON: " + e.getMessage());
     } finally {
       if (conn != null) {
         try {

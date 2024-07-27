@@ -45,12 +45,14 @@ interface studentType {
 }
 const Dashboard = ({ params }: Props) => {
   const timeOfDay = getTime();
+  const [isLoading, setIsLoading] = useState(true);
   const { studentInfoStored} = useContext(AuthInfo);
   const [studentInfo, setStudentInfo] = useState<studentType | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         const response = await axios.get(
           `http://localhost:8002/course_service/student_info?s_id=${params.id}`
         );
@@ -65,6 +67,9 @@ const Dashboard = ({ params }: Props) => {
         // Update state with fetched data
       } catch (error) {
         console.error(error);
+      }
+      finally {
+        setIsLoading(false);
       }
     };
     fetchData()
@@ -81,6 +86,14 @@ const Dashboard = ({ params }: Props) => {
  
   // console.log('StudentInfoStored: ', studentInfoStored?.id);
   //     console.log('param: ', params.id);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div>

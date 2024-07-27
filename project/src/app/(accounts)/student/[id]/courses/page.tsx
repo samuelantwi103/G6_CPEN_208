@@ -6,6 +6,7 @@ import { Book, User, Mail, Phone, Calendar, Clock } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const schema = z.object({
   selectedCourses: z.array(z.string()).min(1, "Select at least one course."),
@@ -42,22 +43,38 @@ const CoursePage = ({ params }: Props) => {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(schema)
+  const [authError, setAuthError] = useState("");
+  const { 
+    register, 
+    handleSubmit, 
+    setError: setFormError,
+     clearErrors,
+      formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { selectedCourses: [] },
   });
 
   const onSubmit = async (data: FormData) => {
-    console.log("Submit functioning");
-    console.log(data);
-
+    // console.log("Submit functioning");
+    // console.log(data);
     const enrollmentData = {
       student_id: Number(params.id),
       courses: data.selectedCourses,
     };
+    if (data.selectedCourses.length === 0) {
+      setFormError("selectedCourses", {
+        type: "manual",
+        message: "Select at least one course.",
+      });
 
+      setTimeout(() => {
+        clearErrors("selectedCourses");
+      }, 60000); // Clear the error after 1 minute (60000 milliseconds)
+    } else {
+      
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/course_service/enroll_into_course`,
+        `http://localhost:8002/course_service/enroll_into_course`,
         enrollmentData,
         {
           headers: {
@@ -72,21 +89,26 @@ const CoursePage = ({ params }: Props) => {
         window.location.reload();
         // setMessageType("success");
       } else {
-        console.error("Error registering for course:", response.data.message);
+        // console.error("Error registering for course:", response.data.message);
         setError(response.data.message || "Registration failed");
-        window.location.reload();
+        setAuthError("Already registered!")
+        // window.location.reload();
       }
     } catch (e) {
       console.error("Error:", e);
       setError("Error registering for course. Please try again later.");
     }
+    }
+
+  
+
   };
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/course_service/enrollment_courses`);
+        const response = await axios.get(`http://localhost:8002/course_service/enrollment_courses`);
         setAvailableCourses(response.data || []);
       } catch (error) {
         console.error("Failed to fetch available courses:", error);
@@ -103,7 +125,7 @@ const CoursePage = ({ params }: Props) => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/course_service/student_grades?s_id=${params.id}`
+          `http://localhost:8002/course_service/student_grades?s_id=${params.id}`
         );
         setCourses(response.data.grades || []);
       } catch (error) {
@@ -124,19 +146,19 @@ const CoursePage = ({ params }: Props) => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-          role="alert"
-        >
-          <strong className="font-bold">Error!</strong>
-          <span className="block sm:inline"> {error}</span>
-        </div>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       <div
+  //         className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+  //         role="alert"
+  //       >
+  //         <strong className="font-bold">Error!</strong>
+  //         <span className="block sm:inline"> {error}</span>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -201,6 +223,11 @@ const CoursePage = ({ params }: Props) => {
         <h2 className="text-2xl font-bold text-gray-900 mb-6">
           Register for a New Course
         </h2>
+        {authError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{authError}</AlertDescription>
+          </Alert>
+        )}
         {availableCourses.length === 0 ? (
           <p className="text-gray-600">
             No courses available for registration.
@@ -265,6 +292,10 @@ const CoursePage = ({ params }: Props) => {
                   ))}
                 </tbody>
               </table>
+              {/* Display validation error */}
+            {errors.selectedCourses && (
+              <p className="text-red-500 mt-2">{errors.selectedCourses.message}</p>
+            )}
               {/* Submit Button */}
               <button
                 type="submit"

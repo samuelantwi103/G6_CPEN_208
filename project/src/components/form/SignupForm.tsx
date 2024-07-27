@@ -8,6 +8,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Mail, Lock, User, Phone, School, Calendar } from 'lucide-react';
 import Link from "next/link";
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const schema = z.object({
     // student_id: z.string().min(8,  "Invalid Student ID").max(8, "Invalid Student ID"),
@@ -30,6 +31,7 @@ type FormData = z.infer<typeof schema>;
 
 const SignUpForm = () => {
   const router = useRouter();
+  const [authError, setAuthError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -40,7 +42,7 @@ const SignUpForm = () => {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    const hash = await bcrypt.hash(data.password, 10);
+    // const hash = await bcrypt.hash(data.password, 10);
     
     // console.log(data);
 
@@ -55,13 +57,13 @@ const SignUpForm = () => {
         }
       );
         // console.log(response);
-      if (response.status === 201 || response.status === 200) {
+        if (response.data.status === "success")  {
         router.push("/");
       } else {
-        console.error("Error creating account");
+        setAuthError("Student already exist");
       }
     } catch (e) {
-      console.error("Error:", e);
+      setAuthError("An error occurred. Please try again later.");
     }
   };
 
@@ -71,6 +73,11 @@ const SignUpForm = () => {
         <h1 className="text-xl font-semibold text-center text-blue-500 mb-2">University of Ghana</h1>
         <h2 className="text-2xl font-bold mb-2 text-center">Sign Up</h2>
         <p className="text-center text-gray-600 mb-6">Let&apos;s create your account</p>
+        {authError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{authError}</AlertDescription>
+          </Alert>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           
       
