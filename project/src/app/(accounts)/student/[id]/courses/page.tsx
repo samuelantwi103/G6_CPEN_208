@@ -53,19 +53,6 @@ const CoursePage = ({ params }: Props) => {
     defaultValues: { selectedCourses: [] },
   });
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { checked, value } = event.target;
-    const courseId = Number(value);
-
-    setSelectedCourses((prevSelectedCourses) => {
-      if (checked) {
-        return [...prevSelectedCourses, courseId]; // Add course if checked
-      } else {
-        return prevSelectedCourses.filter((id) => id !== courseId); // Remove course if unchecked
-      }
-    });
-  };
-
   const onSubmit = async (data: FormData) => {
     console.log("Submit functioning");
     console.log(data);
@@ -88,7 +75,6 @@ const CoursePage = ({ params }: Props) => {
       if (response.data.status === "success") {
         setMessage("Successfully registered for the course(s)!");
         setMessageType("success");
-        // Reset selected courses after successful submission
         setSelectedCourses([]);
       } else {
         console.error("Error registering for course:", response.data.message);
@@ -219,7 +205,7 @@ const CoursePage = ({ params }: Props) => {
           ))}
         </div>
       )}
-
+        butto
       {/* Register for a new course */}
       <div className="mt-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -263,9 +249,7 @@ const CoursePage = ({ params }: Props) => {
                         <input
                           type="checkbox"
                           {...register("selectedCourses")}
-                          id={course.course_id}
                           value={course.course_id}
-                          onChange={handleCheckboxChange}
                         />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
