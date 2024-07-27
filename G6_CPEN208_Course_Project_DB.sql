@@ -431,29 +431,53 @@ SELECT admin.add_course('{"course_code":"CPEN 206", "course_name":"Linear Circui
 
 -- Function in student schema to Enroll a Student in a Course
 -- \/
-CREATE OR REPLACE FUNCTION student.enroll_student(enrollment_info JSON)
-RETURNS JSON AS $$
+CREATE OR REPLACE FUNCTION student.enroll_student(
+	enrollment_info json)
+    RETURNS json
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
-    result JSON;
+    result JSON := '[]'::JSON;
+    enroll_record JSON;
+    s_id INT;
+    c_id INT;
+    e_id INT;
 BEGIN
-    INSERT INTO student.course_enrollment (enrollment_id, student_id, course_id, date_enrolled)
-        (SELECT COALESCE(MAX(enrollment_id), 11111110) + 1 FROM student.course_enrollment),
-        (enrollment_info->>'student_id')::INT,
-        (enrollment_info->>'course_id')::INT,
-        CURRENT_DATE
-    )
-    RETURNING enrollment_id INTO result;
-    
-    RETURN json_build_object('status', 'success', 'enrollment_id', result);
+    s_id := (enrollment_info->>'student_id')::INT;
+
+    FOR enroll_record IN SELECT * FROM json_array_elements(enrollment_info->'courses') LOOP
+        c_id := enroll_record;
+
+        INSERT INTO student.course_enrollment (enrollment_id, student_id, course_id, date_enrolled)
+        VALUES (
+            (SELECT COALESCE(MAX(enrollment_id), 11111110) + 1 FROM student.course_enrollment),
+            s_id,
+            c_id,
+            CURRENT_DATE
+        )
+        RETURNING enrollment_id INTO e_id;
+
+        result := json_build_object('student_id', s_id, 'course_id', c_id, 'enrollment_id', e_id);
+    END LOOP;
+
+    RETURN json_build_object('status', 'success', 'enrollments', result);
 EXCEPTION
     WHEN OTHERS THEN
         RETURN json_build_object('status', 'error', 'message', SQLERRM);
-    VALUES (
 END;
-$$ LANGUAGE plpgsql;
+$BODY$;
 
--- USE CASE
-SELECT student.enroll_student('{"student_id": 11111114, "course_id": 11111111}');
+ALTER FUNCTION student.enroll_student(json)
+    OWNER TO postgres;
+
+SELECT student.enroll_student('{
+  "student_id": 11111117, 
+  "courses": [11111111]
+}');
+
+
 
 -- Function in admin schema to add admin to admin_data
 -- \/

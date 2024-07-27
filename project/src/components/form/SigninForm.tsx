@@ -1,23 +1,27 @@
 "use client";
-import React, { useState }  from "react";
+import React, { useContext, useState }  from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { signIn } from "next-auth/react";
 import axios from "axios";
+import Link from "next/link";
+import { AuthInfo } from "@/utils/student_api";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
 });
 
+
 type FormData = z.infer<typeof schema>;
 
 const SignInForm = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const { studentInfoStored, setStudentInfoStored} = useContext(AuthInfo);
 
   const {
     register,
@@ -26,12 +30,13 @@ const SignInForm = () => {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
+    console.log('Info SUbmitted')
     const endpoint = `http://localhost:8002/course_service/auth_user?id=${data.email}&password=${data.password}`;
     const response = await axios.get(endpoint)
     .then(response => {
-      if (response.data.status === 'success') {
+      if (response.data.status === `success`) {
         console.log('Login successful:', response.data);
-        // Redirect to the dashboard
+      setStudentInfoStored({id: response.data.user_type,type: response.data.user_id})
         window.location.href = `${response.data.user_type}/${response.data.user_id}`;
         
       } else {
@@ -47,8 +52,6 @@ const SignInForm = () => {
   
   
   };
-  
-
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-blue-200">
@@ -87,7 +90,7 @@ const SignInForm = () => {
           {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
 
           {/* <div className="text-right">
-            <a href="#" className="text-pink-500 text-sm">Forgot Password?</a>
+            <Link href="#" className="text-pink-500 text-sm">Forgot Password?</Link>
           </div> */}
 
           <button
@@ -99,7 +102,7 @@ const SignInForm = () => {
           </button>
         </form>
         <p className="text-xs text-center text-gray-500">
-          Don&apos;t have an account? <a href="/signup" className="text-blue-500 font-semibold">Sign Up</a>
+          Don&apos;t have an account? <Link href="/signup" className="text-blue-500 font-semibold">Sign Up</Link>
         </p>
       </div>
     </div>

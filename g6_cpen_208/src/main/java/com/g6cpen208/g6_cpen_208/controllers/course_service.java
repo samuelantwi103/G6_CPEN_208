@@ -16,6 +16,7 @@ public class course_service {
 
   // GET HTTP REQUESTS
   // Yearly outstanding fees
+  @CrossOrigin(origins = "*")
   @GetMapping("/yearly_outstanding_fees")
   public Object yearly_outstanding_fees(@RequestParam int s_id, @RequestParam int acad_year) {
     course_l.con = db_config.getCon();
