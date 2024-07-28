@@ -26,13 +26,14 @@ const AuthLayout: FC<AuthLayoutProps> = async ({children}) => {
       </button>
 
       {/* Sidebar */}
-      <aside className="w-64 bg-blue-100 text-blue-800 sticky top-0 z-[400] h-screen">  
+       
       <aside className={`
         w-64 bg-blue-100 text-blue-800 fixed inset-y-0 left-0 z-40
         transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         md:relative md:translate-x-0
       `}>
+        <aside className="w-64  sticky top-0  h-screen"> 
         <div className="p-4">
           <h2 className="text-2xl font-bold">University of Ghana</h2>
         </div>
