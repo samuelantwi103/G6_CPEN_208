@@ -52,7 +52,7 @@ const FinancePage = ({ params }: Props) => {
 
   if (studentInfo.length === 0) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-6 py-3">
         <h1 className="text-3xl font-bold mb-6">Financial Summary</h1>
         <div className="bg-yellow-100 p-4 rounded-lg">
           <p className="text-xl">No payment made</p>

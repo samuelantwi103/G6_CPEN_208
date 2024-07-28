@@ -44,7 +44,7 @@ const GetDate = ({params}:Props) => {
     
       <div className="flex justify-between items-center mb-6">
         {/* // div class to display the search on the left */}
-        <div className="relative">
+        <div className="relative ">
           <input
             type="text"
             placeholder="Search courses"

@@ -58,8 +58,8 @@ const ProfilePage = ({params}: Props) => {
   }, [params.id]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      <div className="flex-grow p-6">
+    <div className="flex flex-col h-screen bg-gray-100 py-3">
+      <div className="flex-grow ">
         <h2 className="text-2xl font-bold mb-6">Welcome, {studentInfo?.fname} {studentInfo?.lname}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Student Info Card */}

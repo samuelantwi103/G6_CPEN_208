@@ -1,7 +1,5 @@
 "use client";
-import Image from "next/image";
 import React from "react";
-
 import {
   LayoutDashboard,
   CircleUser,
@@ -9,32 +7,26 @@ import {
   Book,
   LucideIcon,
   LogOutIcon,
-  CalendarCheck,
-  School,
 } from "lucide-react";
-
 import SidebarItem from "@/components/sidebar/item";
-import Sidebaritem from "@/components/sidebar/item";
-import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 
+interface SidebarItem {
+  name: string;
+  icon: LucideIcon;
+  path: string;
+  items?: SubItem[];
+}
+
+interface SubItem {
+  name: string;
+  path: string;
+}
 
 const Sidebar = () => {
   const params = useParams();
 
-  interface Sidebaritem {
-    name: string;
-    icon: LucideIcon;
-    path: string;
-    items?: SubItem[];
-  }
-  
-  interface SubItem {
-    name: string;
-    path: string;
-  }
-  
-  const itemsTop: Sidebaritem[] = [
+  const itemsTop: SidebarItem[] = [
     {
       name: "Dashboard",
       path: `/student/${params.id}`,
@@ -51,7 +43,8 @@ const Sidebar = () => {
       icon: Wallet,
     },
   ];
-  const itemsBottom: Sidebaritem[] = [
+
+  const itemsBottom: SidebarItem[] = [
     {
       name: "Profile",
       path: `/student/${params.id}/profile`,
@@ -63,28 +56,24 @@ const Sidebar = () => {
       icon: LogOutIcon,
     },
   ];
- console.log(params)
+
   return (
-    <div className=" flex sticky top-16 z-[400]">
-      <div>
-        {/* <Image className={styles.userImage} src="/noavatar.png" alt="" width={50} height={50}/> */}
-        {/* <div className={styles.userDetail}>
-          <span className={styles.username}>Yhoung</span>
-          <span className={styles.userTitle}>John@gmail.com</span>
-          </div> */}
+    <div className="flex flex-col top-0 z-[40] h-screen sticky">
+      <div className="p-5">
+        <h2 className="text-2xl font-bold ">University of Ghana</h2>
       </div>
-      <div className="flex flex-col space-y-10 justify-between w-full h-[calc(100vh-150px)]">
-        <div className="flex flex-col space-y-2 bg-green ">
+      <nav className="flex flex-col flex-grow justify-between w-full h-[calc(100vh-150px)]">
+        <div className="flex flex-col space-y-2 bg-green">
           {itemsTop.map((item) => (
             <SidebarItem key={item.path} item={item} />
           ))}
         </div>
-        <div className="flex flex-col space-y-2 bg-green ">
+        <div className="flex flex-col space-y-2 bg-green mb-6">
           {itemsBottom.map((item) => (
             <SidebarItem key={item.path} item={item} />
           ))}
         </div>
-      </div>
+      </nav>
     </div>
   );
 };
