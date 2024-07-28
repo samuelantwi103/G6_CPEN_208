@@ -101,7 +101,7 @@ const ProfilePage = ({params}: Props) => {
             content="View your enrolled courses" 
           />
           </Link>
-          <Link href={`/student/${params.id}/courses`}>
+          <Link href={`/student/${params.id}/finance`}>
           <QuickLinkCard 
             icon={<DollarSign size={24} />} 
             title="Financial Summary" 
