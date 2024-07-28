@@ -17,7 +17,7 @@ const AuthLayout: FC<AuthLayoutProps> = ({ children }) => {
       {/* Sidebar Toggle Button (visible on mobile) */}
       <button
         onClick={toggleSidebar}
-        className="fixed top-4 left-4 z-50 md:hidden  text-white p-2 rounded-md shadow-md"
+        className="fixed top-4 bg-blue-100 left-4 z-50 md:hidden  text-white p-2 rounded-md shadow-md"
       >
         {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
