@@ -16,7 +16,7 @@ const AuthLayout: FC<AuthLayoutProps> = async ({children}) => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className="flex h-screen bg-gray-100 ">
+    <div className="flex h-full bg-gray-100 ">
       {/* Sidebar Toggle Button (visible on mobile) */}
       <button
         onClick={toggleSidebar}
@@ -26,6 +26,7 @@ const AuthLayout: FC<AuthLayoutProps> = async ({children}) => {
       </button>
 
       {/* Sidebar */}
+      <aside className="w-64 bg-blue-100 text-blue-800 sticky top-0 z-[400] h-screen">  
       <aside className={`
         w-64 bg-blue-100 text-blue-800 fixed inset-y-0 left-0 z-40
         transform transition-transform duration-300 ease-in-out
@@ -39,7 +40,7 @@ const AuthLayout: FC<AuthLayoutProps> = async ({children}) => {
           <Sidebar />
         </nav>
       </aside>
-
+      </aside>
       {/* Main Content */}
       <main className="flex-1 p-8 ">
         {/* Overlay to close sidebar on mobile when clicked outside */}
