@@ -124,6 +124,42 @@ public class course_service {
     Object result = course_l.enrollment_courses();
     return result;
   }
+  
+  // GET COURSE WORKS FOR A COURSE AS A STUDENT(ASSIGNMENTS AVAILABLE)
+  @CrossOrigin(origins = "*")
+  @GetMapping("/get_course_works")
+  public Object get_course_works(@RequestParam int s_id,@RequestParam int c_id) {
+    course_l.con = db_config.getCon();
+    Object result = course_l.get_course_works(s_id, c_id);
+    return result;
+  }
+  
+  // GET ALL COURSE SUBMISSIONS FOR A COURSE WORK BY A LECTURER
+  @CrossOrigin(origins = "*")
+  @GetMapping("/get_all_course_submissions")
+  public Object get_all_course_submissions(@RequestParam int cw_id) {
+    course_l.con = db_config.getCon();
+    Object result = course_l.get_all_course_submissions(cw_id);
+    return result;
+  }
+  
+  // GET ALL COURSE WORKS FOR A COURSE BY BOTH LECTURERS AND STUDENTS
+  @CrossOrigin(origins = "*")
+  @GetMapping("/get_all_course_submissions_for_course")
+  public Object get_all_course_submissions_for_course(@RequestParam int c_id) {
+    course_l.con = db_config.getCon();
+    Object result = course_l.get_all_course_submissions_for_course(c_id);
+    return result;
+  }
+  
+  // GET NOTIFICATIONS FOR USER
+  @CrossOrigin(origins = "*")
+  @GetMapping("/get_notifications")
+  public Object get_notifications(@RequestParam int user_id, @RequestParam String user_type) {
+    course_l.con = db_config.getCon();
+    Object result = course_l.get_notifications(user_id, user_type);
+    return result;
+  }
 
 
   // POST HTTP REQUESTS
@@ -189,4 +225,68 @@ public class course_service {
     String result  = course_l.assign_lecturer(json_request);
     return result;
   }
+
+  // Assign a Lecturer to a course
+  @CrossOrigin(origins = "*")
+  @PostMapping("/add_course_work")
+  public String add_course_work(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.add_course_work(json_request);
+    return result;
+  }
+
+  // Assign a Lecturer to a course
+  @CrossOrigin(origins = "*")
+  @PostMapping("/add_course_work_submission")
+  public String add_course_work_submission(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.add_course_work_submission(json_request);
+    return result;
+  }
+
+  // Assign a Lecturer to a course
+  @CrossOrigin(origins = "*")
+  @PostMapping("/update_course_work")
+  public String update_course_work(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.update_course_work(json_request);
+    return result;
+  }
+
+  // Assign a Lecturer to a course
+  @CrossOrigin(origins = "*")
+  @PostMapping("/update_course_work_submission")
+  public String update_course_work_submission(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.update_course_work_submission(json_request);
+    return result;
+  }
+
+  // score_course_submission
+  @CrossOrigin(origins = "*")
+  @PostMapping("/score_course_submission")
+  public String score_course_submission(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.score_course_submission(json_request);
+    return result;
+  }
+
+  // CRFATE A GENERAL NOTIFICATION
+  @CrossOrigin(origins = "*")
+  @PostMapping("/add_general_notification")
+  public String add_general_notification(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.add_system_notification(json_request);
+    return result;
+  }
+
+  // CRFATE A COURSE NOTIFICATION BY LECTURER
+  @CrossOrigin(origins = "*")
+  @PostMapping("/add_course_notification")
+  public String add_course_notification(@RequestBody String json_request) {
+    course_l.con = db_config.getCon();
+    String result  = course_l.add_course_notification(json_request);
+    return result;
+  }
+
 }

@@ -4,6 +4,7 @@ import { createContext, ReactNode, useState } from "react";
 interface studentType {
   id: string | null;
   type: string | null;
+  // isLoggedIn: boolean;
 }
 
 interface AuthContextType {

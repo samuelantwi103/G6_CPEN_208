@@ -956,3 +956,508 @@ $$ LANGUAGE plpgsql;
 
 -- USE CASE
 SELECT student.get_courses_with_lecturers();
+
+-- ----------------------------------------------- --
+--                                                 --
+--  NEW FUNcTIONS FOR NOTIFICATION AND SUBMISSIONS --
+--                                                 --
+-- ----------------------------------------------- --
+
+-- Create course_work table in staff schema
+CREATE TABLE staff.course_work (
+    id SERIAL PRIMARY KEY,
+    course_work_id  SERIAL UNIQUE NOT NULL,
+    assignment_id INT NOT NULL REFERENCES staff.lecturer_assignment(assignment_id),
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    due_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create course_work_submission table in student schema
+CREATE TABLE student.course_work_submission (
+    id SERIAL PRIMARY KEY,
+    submission_id SERIAL UNIQUE NOT NULL,
+    course_work_id INT NOT NULL REFERENCES staff.course_work(course_work_id),
+    student_id INT NOT NULL REFERENCES student.student_data(student_id),
+    file_link VARCHAR(255),
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    late_submission BOOLEAN DEFAULT FALSE,
+    score NUMERIC(5,2)
+);
+
+-- Create system_notifications table in admin schema
+CREATE TABLE admin.system_notifications (
+    id SERIAL PRIMARY KEY,
+    notification_id SERIAL UNIQUE NOT NULL,
+    author_id INT NOT NULL,
+    author_type VARCHAR(10) CHECK (author_type IN ('student', 'staff', 'admin')),
+    target_type VARCHAR(10) CHECK (target_type IN ('student', 'staff', 'admin')),
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create course_notifications table in staff schema
+CREATE TABLE staff.course_notifications (
+    id SERIAL PRIMARY KEY,
+    notification_id SERIAL UNIQUE NOT NULL,
+    assignment_id INT NOT NULL REFERENCES staff.lecturer_assignment(assignment_id),
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CONSTRAINT TO PREVENT REPEATED SUBMISSIONS FOR A COURSE WORK
+-- MULTIPLE FILE SUBMISSIONS ARE ALLOWED
+ALTER TABLE student.course_work_submission
+ADD CONSTRAINT unique_course_work_submission UNIQUE (course_work_id, student_id, file_link);
+
+
+-- Trigger function to mark late submissions
+CREATE OR REPLACE FUNCTION mark_late_submission()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.submitted_at > (SELECT due_date FROM staff.course_work WHERE course_work_id = NEW.course_work_id) THEN
+        NEW.late_submission := TRUE;
+    ELSE
+        NEW.late_submission := FALSE;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_mark_late_submission
+BEFORE INSERT ON student.course_work_submission
+FOR EACH ROW
+EXECUTE FUNCTION mark_late_submission();
+
+
+-- Trigger function to notify students of new course work
+CREATE OR REPLACE FUNCTION notify_course_work()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO staff.course_notifications (assignment_id, message)
+    SELECT NEW.assignment_id, 'New course work added: ' || NEW.title;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_notify_course_work
+AFTER INSERT ON staff.course_work
+FOR EACH ROW
+EXECUTE FUNCTION notify_course_work();
+
+
+-- Create sequences
+CREATE SEQUENCE staff.course_work_course_work_id_seq;
+CREATE SEQUENCE student.course_work_submission_submission_id_seq;
+CREATE SEQUENCE admin.system_notifications_notification_id_seq;
+CREATE SEQUENCE staff.course_notifications_notification_id_seq;
+
+-- Alter tables to use the sequences
+ALTER TABLE staff.course_work ALTER COLUMN course_work_id SET DEFAULT nextval('staff.course_work_course_work_id_seq');
+ALTER TABLE student.course_work_submission ALTER COLUMN submission_id SET DEFAULT nextval('student.course_work_submission_submission_id_seq');
+ALTER TABLE admin.system_notifications ALTER COLUMN notification_id SET DEFAULT nextval('admin.system_notifications_notification_id_seq');
+ALTER TABLE staff.course_notifications ALTER COLUMN notification_id SET DEFAULT nextval('staff.course_notifications_notification_id_seq');
+
+
+
+-- FUNCTIONS
+-- ADD COURSE WORK
+CREATE OR REPLACE FUNCTION staff.add_course_work(input_json JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    INSERT INTO staff.course_work (course_work_id, assignment_id, title, description, due_date)
+    VALUES (
+		(SELECT COALESCE(MAX(course_work_id), 0) + 1 FROM course_work.course_work_id),
+        (input_json->>'assignment_id')::INT,
+        input_json->>'title',
+        input_json->>'description',
+        (input_json->>'due_date')::DATE
+    )
+    RETURNING json_build_object(
+        'course_work_id', course_work_id,
+        'assignment_id', assignment_id,
+        'title', title,
+        'description', description,
+        'due_date', due_date,
+        'created_at', created_at,
+        'updated_at', updated_at
+    ) INTO result;
+
+    RETURN json_build_object('status', 'success', 'course_work', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT staff.add_course_work(
+    '{"assignment_id": 11111112, "title": "Final Exam", "description": "Final exam covering all that we have learnt", "due_date": "2024--30"}'::JSON
+);
+
+-- UPDATE COURSE WORK
+CREATE OR REPLACE FUNCTION staff.update_course_work(input_json JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    UPDATE staff.course_work
+    SET title = input_json->>'title',
+        description = input_json->>'description',
+        due_date = (input_json->>'due_date')::DATE,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE course_work_id = (input_json->>'course_work_id')::INT
+    RETURNING json_build_object(
+        'course_work_id', course_work_id,
+        'assignment_id', assignment_id,
+        'title', title,
+        'description', description,
+        'due_date', due_date,
+        'created_at', created_at,
+        'updated_at', updated_at
+    ) INTO result;
+
+    RETURN json_build_object('status', 'success', 'course_work', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT staff.update_course_work(
+    '{"course_work_id": 1, "title": "Updated Midterm Exam", "description": "Updated midterm exam covering chapters 1-6", "due_date": "2024-10-05"}'::JSON
+);
+-- STUDENT SUBMITTING COURSE WORK
+CREATE OR REPLACE FUNCTION student.add_course_work_submission(input_json JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    INSERT INTO student.course_work_submission (submission_id, course_work_id, student_id, file_link)
+    VALUES (
+		(SELECT COALESCE(MAX(submission_id), 0) + 1 FROM student.course_work_submission),
+        (input_json->>'course_work_id')::INT,
+        (input_json->>'student_id')::INT,
+        input_json->>'file_link'
+    )
+    RETURNING json_build_object(
+        'submission_id', submission_id,
+        'course_work_id', course_work_id,
+        'student_id', student_id,
+        'file_link', file_link,
+        'submitted_at', submitted_at,
+        'late_submission', late_submission,
+        'score', score
+    ) INTO result;
+
+    RETURN json_build_object('status', 'success', 'submission', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT student.add_course_work_submission(
+    '{"course_work_id": 1, "student_id": 11111111, "file_link": "http://example.com/submission2.pdf"}'::JSON
+);
+
+-- GOT TO THIS POINT. NOW COMING TO DO THIS
+-- UPDATE COURSE WORK SUBMISSION
+CREATE OR REPLACE FUNCTION student.update_course_work_submission(input_json JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    UPDATE student.course_work_submission
+    SET file_link = input_json->>'file_link',
+        submitted_at = CURRENT_TIMESTAMP
+    WHERE submission_id = (input_json->>'submission_id')::INT
+    RETURNING json_build_object(
+        'submission_id', submission_id,
+        'course_work_id', course_work_id,
+        'student_id', student_id,
+        'file_link', file_link,
+        'submitted_at', submitted_at,
+        'late_submission', late_submission,
+        'score', score
+    ) INTO result;
+
+    RETURN json_build_object('status', 'success', 'submission', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT student.update_course_work_submission(
+    '{"submission_id": 1, "file_link": "http://example.com/submission1_updated.pdf"}'::JSON
+);
+
+-- GET COURSE WORKS FOR A COURSE AS A STUDENT(ASSIGNMENTS AVAILABLE)
+CREATE OR REPLACE FUNCTION student.get_course_works(std_id INT, crs_id INT)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    SELECT json_agg(row_to_json(t))
+    INTO result
+    FROM (
+        SELECT cw.course_work_id, cw.title, cw.description, cw.due_date, cw.created_at, cw.updated_at, cws.submission_id, file_link, submitted_at, late_submission, score
+        FROM staff.course_work cw
+        JOIN staff.lecturer_assignment la ON cw.assignment_id = la.assignment_id
+		JOIN student.course_work_submission cws ON cws.course_work_id = cw.course_work_id
+        WHERE la.course_id = crs_id and cws.student_id = std_id
+    ) t;
+
+    RETURN json_build_object('status', 'success', 'course_works', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT student.get_course_works(11111111, 11111112);
+
+-- GET ALL COURSE SUBMISSIONS FOR A COURSE WORK BY A LECTURER
+CREATE OR REPLACE FUNCTION staff.get_all_course_submissions(cw_id INT)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    SELECT json_agg(row_to_json(t))
+    INTO result
+    FROM (
+        SELECT cws.submission_id, cws.student_id, cws.file_link, cws.submitted_at, cws.late_submission, cws.score
+        FROM student.course_work_submission cws
+        WHERE cws.course_work_id = cw_id
+		ORDER BY cws.student_id ASC
+    ) t;
+
+    RETURN json_build_object('status', 'success', 'submissions', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT staff.get_all_course_submissions(1);
+
+-- SCORING A COURSE WORK SUBMISSION
+CREATE OR REPLACE FUNCTION staff.score_course_submission(input_json JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    UPDATE student.course_work_submission
+    SET score = (input_json->>'score')::NUMERIC(5,2)
+    WHERE submission_id = (input_json->>'submission_id')::INT
+    RETURNING json_build_object(
+        'submission_id', submission_id,
+        'course_work_id', course_work_id,
+        'student_id', student_id,
+        'file_link', file_link,
+        'submitted_at', submitted_at,
+        'late_submission', late_submission,
+        'score', score
+    ) INTO result;
+
+    RETURN json_build_object('status', 'success', 'submission', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT staff.score_course_submission(
+    '{"submission_id": 1, "score": 95.50}'::JSON
+);
+
+-- GET ALL COURSE WORKS FOR A COURSE BY BOTH LECTURERS AND STUDENTS
+CREATE OR REPLACE FUNCTION staff.get_all_course_submissions_for_course(crs_id INT)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    SELECT json_agg(row_to_json(t))
+    INTO result
+    FROM (
+        SELECT cw.*
+        FROM staff.course_work cw 
+        JOIN staff.lecturer_assignment la ON cw.assignment_id = la.assignment_id
+        WHERE la.course_id = crs_id
+    ) t;
+
+    RETURN json_build_object('status', 'success', 'submissions', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT staff.get_all_course_submissions_for_course(11111111);
+
+-- GET NOTIFICATIONS FOR USER
+CREATE OR REPLACE FUNCTION admin.get_notifications(user_id INT, user_type VARCHAR(10))
+RETURNS JSON AS $$
+DECLARE
+    gen_result JSON;
+    course_result JSON;
+BEGIN
+    -- Fetch general notifications
+    SELECT json_agg(row_to_json(t))
+    INTO gen_result
+    FROM (
+        SELECT notification_id, message, created_at
+        FROM admin.system_notifications 
+        WHERE target_type = user_type 
+    ) t;
+
+    -- Fetch course notifications based on user type
+    IF user_type = 'student' THEN
+        SELECT json_agg(row_to_json(t2))
+        INTO course_result
+        FROM (
+            SELECT cn.notification_id, cn.message, cn.created_at
+            FROM staff.course_notifications cn 
+            JOIN staff.lecturer_assignment la ON la.assignment_id = cn.assignment_id
+            JOIN student.course_enrollment ce ON ce.course_id = la.course_id
+            WHERE ce.student_id = user_id 
+        ) t2;
+
+    ELSIF user_type = 'staff' THEN
+        SELECT json_agg(row_to_json(t3))
+        INTO course_result
+        FROM (
+            SELECT cn.notification_id, cn.message, cn.created_at
+            FROM staff.course_notifications cn 
+            JOIN staff.lecturer_assignment la ON la.assignment_id = cn.assignment_id
+            JOIN staff.staff_data sd ON sd.staff_id = la.staff_id
+            WHERE sd.staff_id = user_id 
+        ) t3;
+
+    ELSE
+        course_result := json_build_array('No messages');
+
+    END IF;
+
+    RETURN json_build_object('status', 'success', 'general_notifications', gen_result, 'course_notifications', course_result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Example query
+SELECT admin.get_notifications(11111111, 'staff');
+
+-- CRFATE A GENERAL NOTIFICATION
+CREATE OR REPLACE FUNCTION admin.add_system_notification(json_input JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    INSERT INTO admin.system_notifications (notification_id, author_id, author_type, target_type, message)
+    VALUES (
+        (SELECT COALESCE(MAX(notification_id) ,0) + 1 FROM admin.system_notifications),
+        (json_input->>'author_id')::INT,
+        json_input->>'author_type',
+        json_input->>'target_type',
+        json_input->>'message'
+    )
+    RETURNING json_build_object(
+        'notification_id', notification_id,
+        'author_id', author_id,
+        'author_type', author_type,
+        'target_type', target_type,
+        'message', message,
+        'created_at', created_at
+    ) INTO result;
+
+    RETURN json_build_object('status', 'success', 'notification', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT admin.add_system_notification('{"author_id": 11111111, "author_type": "admin", "target_type": "staff", "message": "Portal open for grading"}'::JSON)
+
+-- ADD A COURSE NOTIFICATION BY A LECTURER
+CREATE OR REPLACE FUNCTION staff.add_course_notification(json_input JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    INSERT INTO staff.course_notifications (notification_id,assignment_id, message)
+    VALUES (
+		(SELECT COALESCE(MAX(notification_id) ,0) + 1 FROM staff.course_notifications),
+        (json_input->>'assignment_id')::INT,
+        json_input->>'message'
+    )
+    RETURNING json_build_object(
+        'notification_id', notification_id,
+        'assignment_id', assignment_id,
+        'message', message,
+        'created_at', created_at
+    ) INTO result;
+
+    RETURN json_build_object('status', 'success', 'notification', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT staff.add_course_notification('{"assignment_id": 11111111, "message": "Your scores for assesment one has been released"}'::JSON)
+
+-- UPDATE NOTIFICATION
+CREATE OR REPLACE FUNCTION admin.update_notification_message(input_json JSON)
+RETURNS JSON AS $$
+DECLARE
+    result JSON;
+BEGIN
+    IF (input_json->>'notification_type') = 'general' THEN
+        UPDATE admin.system_notifications
+        SET message = (input_json->>'message'),
+            target_type = (input_json->>'target_type')
+        WHERE notification_id = (input_json->>'notification_id')::INT
+        RETURNING json_build_object(
+            'notification_id', notification_id,
+            'author_id', author_id,
+            'author_type', author_type,
+            'target_type', target_type,
+            'message', message,
+            'created_at', created_at
+        ) INTO result;
+
+    ELSIF (input_json->>'notification_type') = 'course' THEN
+        UPDATE staff.course_notifications
+        SET message = (input_json->>'message'),
+            assignment_id = (input_json->>'assignment_id')::INT
+        WHERE notification_id = (input_json->>'notification_id')::INT
+        RETURNING json_build_object(
+            'notification_id', notification_id,
+            'assignment_id', assignment_id,
+            'message', message,
+            'created_at', created_at
+        ) INTO result;
+    ELSE
+        result := json_build_object('status', 'error', 'message', 'Notification type not specified. Must be either "course" or "general"');
+        RETURN json_build_object('status', 'error', 'notification', result);
+    END IF;
+
+    RETURN json_build_object('status', 'success', 'notification', result);
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN json_build_object('status', 'error', 'message', SQLERRM);
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT admin.update_notification_message('{"notification_id": 3, "assignment_id": 11111111, "notification_type": "course", "message": "Your scores for assessment two have been released"}'::JSON);
