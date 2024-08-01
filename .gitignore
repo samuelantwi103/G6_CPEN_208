@@ -7,3 +7,4 @@
 # *.properties
 # g6_cpen_208\src\main\resources\application.properties 
 g6_cpen_208/src/main/resources/application.properties
+*.properties
