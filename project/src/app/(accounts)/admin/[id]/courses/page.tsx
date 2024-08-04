@@ -8,13 +8,13 @@ const CoursePage = () => {
     <div>
       <main>
         <h1>Course</h1>
-        {/* <button
+        <button
           onClick={() => {
             console.log(params.id);
           }}
         >
           Params
-        </button> */}
+        </button>
       </main>
     </div>
   );

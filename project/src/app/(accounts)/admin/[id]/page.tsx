@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-// import { getadminGrades } from '@/utils/[...nextauth]/admin_api';
+// import { getstaffGrades } from '@/utils/[...nextauth]/staff_api';
 
 type Props = {
   params: {
@@ -47,11 +47,11 @@ const Dashboard = ({params}:Props) => {
     <div className="mb-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold">Your courses</h3>
-              <Link href={`/admin/${params.id}/courses`} className="text-sm text-blue-600">View All</Link>
+              <Link href={`/staff/${params.id}/courses`} className="text-sm text-blue-600">View All</Link>
             </div>
             <Card className="bg-white shadow-sm mb-4">
               <CardContent className="p-4 flex items-center">
-              <Link href={`/admin/${params.id}/courses`}><Image src="/books.jpg" alt="Placeholder" width={48} height={48} className="w-12 h-12 bg-gray-200 rounded-lg mr-4"/> </Link>
+              <Link href={`/staff/${params.id}/courses`}><Image src="/books.jpg" alt="Placeholder" width={48} height={48} className="w-12 h-12 bg-gray-200 rounded-lg mr-4"/> </Link>
                 <div>
                   <p className="font-semibold">Course One</p>
                   <p className="text-xs text-gray-500">12 lessons • 6h 30min • Beginner</p>
@@ -62,7 +62,7 @@ const Dashboard = ({params}:Props) => {
             
             <Card className="bg-white shadow-sm">
               <CardContent className="p-4 flex items-center">
-              <Link href={`/admin/${params.id}/courses`}><Image src="/books.jpg" alt="Placeholder" width={48} height={48}  className="w-12 h-12 bg-gray-200 rounded-lg mr-4"/> </Link>
+              <Link href={`/staff/${params.id}/courses`}><Image src="/books.jpg" alt="Placeholder" width={48} height={48}  className="w-12 h-12 bg-gray-200 rounded-lg mr-4"/> </Link>
                 <div>
                   <p className="font-semibold">Course Two</p>
                   <p className="text-xs text-gray-500">8 lessons • 4h 15min • Beginner</p>
@@ -77,7 +77,7 @@ const Dashboard = ({params}:Props) => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-lg font-semibold">Course Task</CardTitle>
-                <Link href={`/admin/${params.id}/finance`}  className="text-sm text-blue-600">View All</Link>
+                <Link href={`/staff/${params.id}/finance`}  className="text-sm text-blue-600">View All</Link>
               </div>
             </CardHeader>
             <CardContent>
@@ -93,9 +93,9 @@ const Dashboard = ({params}:Props) => {
                       <span className="text-sm">{task}</span>
                     </div>
                 
-                      <a href="/assignments">
+                      <Link href="/assignments">
                         <ChevronRight size={16} className="text-gray-400 transform" />  
-                      </a>
+                      </Link>
 
                   </li>
                 ))}
